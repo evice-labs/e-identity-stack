@@ -1,0 +1,15 @@
+[package]
+name = "membership_registry"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+nssa_core.workspace = true
+spel-framework = { git = "https://github.com/logos-co/spel", branch = "main" }
+
+borsh.workspace = true 
+serde.workspace = true
+sha2.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]

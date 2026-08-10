@@ -1,0 +1,38 @@
+[workspace.package]
+license = "MIT or Apache-2.0"
+
+[workspace]
+resolver = "2"
+members = [
+  "e_moderation_sdk",
+  "e_identity_sdk",
+  "programs/membership_registry",
+]
+
+[workspace.dependencies]
+nssa_core = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.2.0", package = "lee_core" }
+nssa = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.2.0", package = "lee" }
+spel-framework = { git = "https://github.com/logos-co/spel", branch = "main" }
+
+sharks = "0.5.0"
+sha2 = "0.10.8"
+k256 = { version = "0.13.3", features = [
+  "ecdh",
+  "ecdsa-core",
+  "arithmetic",
+  "expose-field",
+  "serde",
+  "pem",
+] }
+
+serde = { version = "1.0.60", default-features = false, features = ["derive"] }
+serde_json = "1.0.81"
+serde_with = "3.16.1"
+borsh = "1.5.7"
+hex = "0.4.3"
+rand = { version = "0.8.5", features = ["std", "std_rng", "getrandom"] }
+thiserror = "2.0"
+
+e_moderation_sdk = { path = "e_moderation_sdk" }
+e_identity_sdk = { path = "e_identity_sdk" }
+membership_registry = { path = "programs/membership_registry" }
