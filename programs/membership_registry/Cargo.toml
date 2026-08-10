@@ -5,9 +5,9 @@ edition = "2021"
 
 [dependencies]
 nssa_core.workspace = true
-spel-framework = { git = "https://github.com/logos-co/spel", branch = "main" }
+spel-framework.workspace = true
 
-borsh.workspace = true 
+borsh.workspace = true
 serde.workspace = true
 sha2.workspace = true
 
