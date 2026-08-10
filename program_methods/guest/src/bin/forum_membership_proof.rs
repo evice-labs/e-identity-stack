@@ -3,11 +3,7 @@
 use serde::{Deserialize, Serialize};
 use risc0_zkvm::guest::env;
 use risc0_zkvm::sha::{Impl, Sha256};
-use nssa_core::{
-    Commitment, NullifierPublicKey, NullifierSecretKey,
-    commitment::compute_digest_for_path,
-    account::Account,
-};
+use nssa_core::{Commitment, NullifierPublicKey, NullifierSecretKey, commitment::compute_digest_for_path};
 
 pub type MembershipProof = (usize, Vec<[u8; 32]>);
 
@@ -39,12 +35,18 @@ pub fn main() {
     let public_inputs: PublicInputs = env::read();
 
     let npk = NullifierPublicKey::from(&private_inputs.nsk);
-    let commitment = Commitment::new(&npk, &Account::default());
 
-    // Verify commitment exists in the registry Merkle tree
+    // Derive commitment bytes from NPK, then construct Commitment via borsh.
+    // This keeps us compatible with lee_core layout changes automatically.
+    let npk_hash: [u8; 32] = Impl::hash_bytes(&npk.0).as_bytes().try_into().unwrap();
+    let commitment_bytes = npk_hash;
+    let commitment: Commitment = borsh::from_slice(&commitment_bytes)
+        .expect("Commitment borsh layout mismatch — check lee_core version");
+
+    // Verify commitment exists in the registry Merkle tree via lee_core
     let computed_registry_root = compute_digest_for_path(
         &commitment,
-        &private_inputs.registry_proof
+        &private_inputs.registry_proof,
     );
 
     assert_eq!(
@@ -53,10 +55,9 @@ pub fn main() {
     );
 
     // Verify commitment has not been revoked
-    let comm_bytes = commitment.to_byte_array();
     for rev_bytes in public_inputs.revoked_commitments.iter() {
         assert_ne!(
-            &comm_bytes, rev_bytes,
+            &commitment_bytes, rev_bytes,
             "Member has been slashed and revoked"
         );
     }
