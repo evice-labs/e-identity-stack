@@ -1,5 +1,4 @@
 use borsh::{BorshDeserialize, BorshSerialize};
-use nssa_core::merkle_tree::MerkleTree;
 use spel_framework::prelude::account_type;
 
 #[account_type]
@@ -9,7 +8,9 @@ pub struct ForumInstance {
     pub k_strikes: u32,
     pub n_moderators: u32,
     pub m_moderators: u32,
-    pub registry: MerkleTree,
+    /// Commitment registry — replaces MerkleTree (not available in lee_core).
+    /// For on-chain identity, commitments are tracked as a flat list.
+    /// LEZ state machine handles Merkle commitment set at the sequencer level.
     pub registered_commitments: Vec<[u8; 32]>,
     pub revoked_commitments: Vec<[u8; 32]>,
     pub total_staked: u64,

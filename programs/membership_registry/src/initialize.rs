@@ -1,5 +1,3 @@
-use nssa_core::merkle_tree::MerkleTree;
-
 use crate::state::ForumInstance;
 
 pub fn process_initialize(
@@ -17,14 +15,11 @@ pub fn process_initialize(
         return Err("K strikes must be at least 1");
     }
 
-    let empty_registry = MerkleTree::with_capacity(1024);
-
     let new_forum = ForumInstance {
         admin_pubkey: [0; 32],
         k_strikes,
         n_moderators,
         m_moderators,
-        registry: empty_registry,
         registered_commitments: Vec::new(),
         revoked_commitments: Vec::new(),
         total_staked: 0,

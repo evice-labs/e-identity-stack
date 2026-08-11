@@ -48,10 +48,7 @@ mod forum_registry {
         let mut forum: ForumInstance = borsh::from_slice(&state.account.data)
             .map_err(|_| spel_framework::error::SpelError::Custom { code: 3, message: "Deserialization error".into() })?;
 
-        let commitment_obj = borsh::from_slice(&commitment)
-            .map_err(|_| spel_framework::error::SpelError::Custom { code: 12, message: "Invalid commitment bytes".into() })?;
-
-        register::process_register(&mut forum, commitment_obj, stake_amount)
+        register::process_register(&mut forum, commitment, stake_amount)
             .map_err(|e| spel_framework::error::SpelError::Custom { code: 4, message: e.into() })?;
 
         let mut member_mut = member.clone();
@@ -113,8 +110,7 @@ mod forum_registry {
             });
         }
 
-        let nsk_obj = nssa_core::NullifierSecretKey::from(slashed_nsk);
-        let confiscated = slash::process_slash(&mut forum, &nsk_obj)
+        let confiscated = slash::process_slash(&mut forum, &slashed_nsk)
             .map_err(|e| spel_framework::error::SpelError::Custom { code: 7, message: e.into() })?;
 
         let mut authority_mut = authority.clone();

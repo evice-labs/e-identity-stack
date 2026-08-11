@@ -1,4 +1,4 @@
-use rand::{rngs::OsRng, Rng as _};
+use rand::{rngs::SysRng, TryRng};
 
 #[derive(Clone, PartialEq, Eq)]
 pub struct PrivateKey([u8; 32]);
@@ -6,9 +6,12 @@ pub struct PrivateKey([u8; 32]);
 impl PrivateKey {
     #[must_use]
     pub fn new_os_random() -> Self {
-        let mut rng = OsRng;
         loop {
-            if let Ok(key) = Self::try_new(rng.r#gen()) {
+            let mut bytes = [0u8; 32];
+            SysRng
+                .try_fill_bytes(&mut bytes)
+                .expect("system RNG unavailable");
+            if let Ok(key) = Self::try_new(bytes) {
                 break key;
             }
         }
