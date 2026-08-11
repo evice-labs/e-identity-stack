@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use serde_with::serde_as;
 
 /// User identity record stored in the on-chain registry.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -31,10 +32,12 @@ pub struct RoomConfig {
 }
 
 /// Room membership record with signed consent.
+#[serde_as]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MembershipRecord {
     pub room_id: [u8; 32],
     pub member_commitment: [u8; 32],
+    #[serde_as(as = "[_; 64]")]
     pub join_signature: [u8; 64],
     pub join_index: u64,
     /// False = left or removed. Record retained for audit.
@@ -51,9 +54,11 @@ pub struct StrikeCertificate {
     pub evidence_hash: [u8; 32],
 }
 
+#[serde_as]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ModeratorSig {
     pub pubkey: [u8; 32],
+    #[serde_as(as = "[_; 64]")]
     pub signature: [u8; 64],
 }
 
