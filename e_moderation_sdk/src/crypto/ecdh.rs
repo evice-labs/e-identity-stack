@@ -1,3 +1,4 @@
+use rand::Rng;
 use sha2::{Digest, Sha256};
 
 /// Compute ECDH shared secret between a local secret key and a remote x-only public key.
@@ -13,13 +14,11 @@ pub fn compute_shared_secret(
     let remote_pubkey = k256::PublicKey::from_sec1_bytes(&sec1_compressed)
         .map_err(|_| "Invalid remote public key for ECDH")?;
 
-    let local_secret = k256::SecretKey::from_bytes(&(*local_sk).into())
-        .map_err(|_| "Invalid local secret key")?;
+    let local_secret =
+        k256::SecretKey::from_bytes(&(*local_sk).into()).map_err(|_| "Invalid local secret key")?;
 
-    let shared_point = k256::ecdh::diffie_hellman(
-        local_secret.to_nonzero_scalar(),
-        remote_pubkey.as_affine(),
-    );
+    let shared_point =
+        k256::ecdh::diffie_hellman(local_secret.to_nonzero_scalar(), remote_pubkey.as_affine());
 
     let mut hasher = Sha256::new();
     hasher.update(b"EVICE/v1/ECDH/");
@@ -42,10 +41,9 @@ pub fn xor_encrypt(buffer: &mut [u8], shared_secret: &[u8; 32], index: u32) {
 
 /// Generate a random ephemeral scalar valid for the secp256k1 curve.
 pub fn generate_ephemeral_scalar() -> [u8; 32] {
-    use rand::RngCore;
     loop {
         let mut sk = [0u8; 32];
-        rand::thread_rng().fill_bytes(&mut sk);
+        rand::rng().fill_bytes(&mut sk);
         if k256::SecretKey::from_bytes(&sk.into()).is_ok() {
             return sk;
         }
@@ -55,8 +53,8 @@ pub fn generate_ephemeral_scalar() -> [u8; 32] {
 /// Derive the x-only public key from a scalar.
 pub fn derive_xonly_pubkey(scalar_bytes: &[u8; 32]) -> [u8; 32] {
     use k256::elliptic_curve::sec1::ToEncodedPoint as _;
-    let sk = k256::SecretKey::from_bytes(&(*scalar_bytes).into())
-        .expect("Scalar was already validated");
+    let sk =
+        k256::SecretKey::from_bytes(&(*scalar_bytes).into()).expect("Scalar was already validated");
     let encoded = sk.public_key().to_encoded_point(false);
     let x_coord = encoded.x().expect("Valid EC point has x-coordinate");
     let mut pk = [0u8; 32];

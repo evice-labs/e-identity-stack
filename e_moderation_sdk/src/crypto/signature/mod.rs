@@ -1,6 +1,6 @@
 pub use private_key::PrivateKey;
 pub use public_key::PublicKey;
-use rand::{rngs::OsRng, RngCore as _};
+use rand::{rngs::SysRng, TryRng};
 
 pub mod private_key;
 pub mod public_key;
@@ -14,7 +14,7 @@ impl Signature {
     #[must_use]
     pub fn new(key: &PrivateKey, message: &[u8]) -> Self {
         let mut aux_random = [0_u8; 32];
-        OsRng.fill_bytes(&mut aux_random);
+        let _ = SysRng.try_fill_bytes(&mut aux_random);
         Self::new_with_aux_random(key, message, aux_random)
     }
 

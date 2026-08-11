@@ -15,7 +15,7 @@ nssa = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", t
 spel-framework = { git = "https://github.com/logos-co/spel", branch = "main" }
 
 sharks = "0.5.0"
-sha2 = "0.10.8"
+sha2 = "0.11.0"
 k256 = { version = "0.13.3", features = [
   "ecdh",
   "ecdsa-core",
@@ -30,7 +30,7 @@ serde_json = "1.0.81"
 serde_with = "3.16.1"
 borsh = "1.5.7"
 hex = "0.4.3"
-rand = { version = "0.8.5", features = ["std", "std_rng", "getrandom"] }
+rand = { version = "0.10.2", features = ["std", "std_rng"] }
 thiserror = "2.0"
 
 e_moderation_sdk = { path = "e_moderation_sdk" }
