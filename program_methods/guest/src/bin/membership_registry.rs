@@ -1,9 +1,9 @@
 #![no_main]
 
+use membership_registry::state::ForumInstance;
+use membership_registry::{initialize, record_strike, register, register_room, slash, verify_post};
 use nssa_core::account::AccountWithMetadata;
 use spel_framework::prelude::*;
-use membership_registry::state::ForumInstance;
-use membership_registry::{initialize, register, slash, verify_post};
 
 risc0_zkvm::guest::entry!(main);
 
@@ -70,6 +70,78 @@ mod forum_registry {
     }
 
     #[instruction]
+    pub fn register_room(
+        #[account(mut, pda = [literal("forum"), arg("forum_id")])]
+        state: AccountWithMetadata,
+        #[account(signer)]
+        admin: AccountWithMetadata,
+        forum_id: [u8; 32],
+        admin_commitment: [u8; 32],
+        n_mod_threshold: u32,
+        m_mod_total: u32,
+        moderator_pubkeys: Vec<[u8; 32]>,
+        min_members_for_maturity: u32,
+    ) -> SpelResult {
+        let mut forum: ForumInstance = borsh::from_slice(&state.account.data)
+            .map_err(|_| spel_framework::error::SpelError::Custom { code: 14, message: "Deserialization error".into() })?;
+
+        if forum.admin_pubkey != *admin.account_id.value() {
+            return Err(spel_framework::error::SpelError::Custom {
+                code: 18, message: "Unauthorized: only admin can register room".into(),
+            });
+        }
+
+        register_room::process_register_room(
+            &mut forum,
+            admin_commitment,
+            n_mod_threshold,
+            m_mod_total,
+            moderator_pubkeys,
+            min_members_for_maturity,
+        )
+        .map_err(|e| spel_framework::error::SpelError::Custom { code: 15, message: e.into() })?;
+
+        let mut state_mut = state.clone();
+        state_mut.account.data = borsh::to_vec(&forum)
+            .map_err(|_| spel_framework::error::SpelError::Custom { code: 16, message: "Serialization error".into() })?
+            .try_into()
+            .map_err(|_| spel_framework::error::SpelError::Custom { code: 17, message: "Data too large".into() })?;
+
+        Ok(SpelOutput::execute(vec![state_mut.account, admin.account], vec![]))
+    }
+
+    #[instruction]
+    pub fn record_strike(
+        #[account(mut, pda = [literal("forum"), arg("forum_id")])]
+        state: AccountWithMetadata,
+        forum_id: [u8; 32],
+        room_id: [u8; 32],
+        target_commitment: [u8; 32],
+        evidence_hash: [u8; 32],
+        n_valid_sigs: u32,
+    ) -> SpelResult {
+        let mut forum: ForumInstance = borsh::from_slice(&state.account.data)
+            .map_err(|_| spel_framework::error::SpelError::Custom { code: 19, message: "Deserialization error".into() })?;
+
+        record_strike::process_record_strike(
+            &mut forum,
+            room_id,
+            target_commitment,
+            evidence_hash,
+            n_valid_sigs,
+        )
+        .map_err(|e| spel_framework::error::SpelError::Custom { code: 20, message: e.into() })?;
+
+        let mut state_mut = state.clone();
+        state_mut.account.data = borsh::to_vec(&forum)
+            .map_err(|_| spel_framework::error::SpelError::Custom { code: 21, message: "Serialization error".into() })?
+            .try_into()
+            .map_err(|_| spel_framework::error::SpelError::Custom { code: 22, message: "Data too large".into() })?;
+
+        Ok(SpelOutput::execute(vec![state_mut.account], vec![]))
+    }
+
+    #[instruction]
     pub fn verify_post(
         #[account(mut, pda = [literal("forum"), arg("forum_id")])]
         state: AccountWithMetadata,
@@ -78,16 +150,16 @@ mod forum_registry {
         tracing_tag: [u8; 32],
     ) -> SpelResult {
         let mut forum: ForumInstance = borsh::from_slice(&state.account.data)
-            .map_err(|_| spel_framework::error::SpelError::Custom { code: 14, message: "Deserialization error".into() })?;
+            .map_err(|_| spel_framework::error::SpelError::Custom { code: 23, message: "Deserialization error".into() })?;
 
         verify_post::process_verify_post(&mut forum, registry_root, tracing_tag)
-            .map_err(|e| spel_framework::error::SpelError::Custom { code: 15, message: e.into() })?;
+            .map_err(|e| spel_framework::error::SpelError::Custom { code: 24, message: e.into() })?;
 
         let mut state_mut = state.clone();
         state_mut.account.data = borsh::to_vec(&forum)
-            .map_err(|_| spel_framework::error::SpelError::Custom { code: 16, message: "Serialization error".into() })?
+            .map_err(|_| spel_framework::error::SpelError::Custom { code: 25, message: "Serialization error".into() })?
             .try_into()
-            .map_err(|_| spel_framework::error::SpelError::Custom { code: 17, message: "Data too large".into() })?;
+            .map_err(|_| spel_framework::error::SpelError::Custom { code: 26, message: "Data too large".into() })?;
 
         Ok(SpelOutput::execute(vec![state_mut.account], vec![]))
     }
@@ -99,7 +171,10 @@ mod forum_registry {
         #[account(signer)]
         authority: AccountWithMetadata,
         forum_id: [u8; 32],
-        slashed_nsk: [u8; 32],
+        target_commitment: [u8; 32],
+        k_rooms_min: u32,
+        min_room_age_indexes: u64,
+        min_room_members: u32,
     ) -> SpelResult {
         let mut forum: ForumInstance = borsh::from_slice(&state.account.data)
             .map_err(|_| spel_framework::error::SpelError::Custom { code: 6, message: "Deserialization error".into() })?;
@@ -110,8 +185,14 @@ mod forum_registry {
             });
         }
 
-        let confiscated = slash::process_slash(&mut forum, &slashed_nsk)
-            .map_err(|e| spel_framework::error::SpelError::Custom { code: 7, message: e.into() })?;
+        let confiscated = slash::process_slash(
+            &mut forum,
+            target_commitment,
+            k_rooms_min,
+            min_room_age_indexes,
+            min_room_members,
+        )
+        .map_err(|e| spel_framework::error::SpelError::Custom { code: 7, message: e.into() })?;
 
         let mut authority_mut = authority.clone();
         authority_mut.account.balance += confiscated as u128;

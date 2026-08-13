@@ -1,0 +1,361 @@
+{
+  "version": "0.1.0",
+  "name": "forum_registry",
+  "instructions": [
+    {
+      "name": "initialize_forum",
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true,
+          "signer": false,
+          "init": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": "forum"
+              },
+              {
+                "kind": "arg",
+                "path": "forum_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": false,
+          "signer": true,
+          "init": false
+        }
+      ],
+      "args": [
+        {
+          "name": "forum_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "k_strikes",
+          "type": "u32"
+        },
+        {
+          "name": "n_moderators",
+          "type": "u32"
+        },
+        {
+          "name": "m_moderators",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "register_member",
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true,
+          "signer": false,
+          "init": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": "forum"
+              },
+              {
+                "kind": "arg",
+                "path": "forum_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "member",
+          "writable": false,
+          "signer": true,
+          "init": false
+        }
+      ],
+      "args": [
+        {
+          "name": "forum_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "commitment",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "stake_amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "register_room",
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true,
+          "signer": false,
+          "init": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": "forum"
+              },
+              {
+                "kind": "arg",
+                "path": "forum_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": false,
+          "signer": true,
+          "init": false
+        }
+      ],
+      "args": [
+        {
+          "name": "forum_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "admin_commitment",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "n_mod_threshold",
+          "type": "u32"
+        },
+        {
+          "name": "m_mod_total",
+          "type": "u32"
+        },
+        {
+          "name": "moderator_pubkeys",
+          "type": {
+            "vec": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        },
+        {
+          "name": "min_members_for_maturity",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "record_strike",
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true,
+          "signer": false,
+          "init": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": "forum"
+              },
+              {
+                "kind": "arg",
+                "path": "forum_id"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "forum_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "room_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "target_commitment",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "evidence_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "n_valid_sigs",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "verify_post",
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true,
+          "signer": false,
+          "init": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": "forum"
+              },
+              {
+                "kind": "arg",
+                "path": "forum_id"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "forum_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "registry_root",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "tracing_tag",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "slash_member",
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true,
+          "signer": false,
+          "init": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": "forum"
+              },
+              {
+                "kind": "arg",
+                "path": "forum_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "authority",
+          "writable": false,
+          "signer": true,
+          "init": false
+        }
+      ],
+      "args": [
+        {
+          "name": "forum_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "target_commitment",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "k_rooms_min",
+          "type": "u32"
+        },
+        {
+          "name": "min_room_age_indexes",
+          "type": "u64"
+        },
+        {
+          "name": "min_room_members",
+          "type": "u32"
+        }
+      ]
+    }
+  ]
+}
