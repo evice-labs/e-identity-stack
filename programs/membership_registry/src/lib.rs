@@ -1,5 +1,7 @@
 pub mod initialize;
+pub mod record_strike;
 pub mod register;
+pub mod register_room;
 pub mod slash;
 pub mod state;
 pub mod verify_post;
