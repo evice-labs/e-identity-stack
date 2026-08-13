@@ -25,6 +25,10 @@ pub fn process_initialize(
         total_staked: 0,
         member_stakes: Vec::new(),
         used_tracing_tags: Vec::new(),
+        rooms: Vec::new(),
+        room_memberships: Vec::new(),
+        recorded_strikes: Vec::new(),
+        current_index: 0,
     };
 
     Ok(new_forum)
