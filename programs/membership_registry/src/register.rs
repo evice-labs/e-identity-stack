@@ -5,9 +5,12 @@ pub fn process_register(
     commitment_bytes: [u8; 32],
     stake_amount: u64,
 ) -> Result<(), &'static str> {
-    if stake_amount < 1000 {
-        return Err("Registration failed: Stake amount is below the minimum limit (1000).");
-    }
+    // TODO(stake): Re-enable once SPEL supports balance transfers from auth-transfer-owned accounts.
+    // LEZ Rule 5 blocks balance decreases on accounts not owned by the executing program.
+    // See: https://github.com/logos-co/spel/pull/262#note-for-reviewers
+    // if stake_amount < 1000 {
+    //     return Err("Registration failed: Stake amount is below the minimum limit (1000).");
+    // }
 
     if forum.registered_commitments.contains(&commitment_bytes) {
         return Err("Registration failed: This commitment is already registered.");

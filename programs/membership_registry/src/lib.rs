@@ -1,4 +1,5 @@
 pub mod initialize;
+pub mod join_room;
 pub mod record_strike;
 pub mod register;
 pub mod register_room;
