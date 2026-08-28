@@ -1,0 +1,18 @@
+[package]
+name = "program_methods"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+nssa_core.workspace = true
+spel-framework.workspace = true
+membership_registry.workspace = true
+
+serde.workspace = true
+borsh.workspace = true
+sha2.workspace = true
+
+risc0-zkvm = { version = "3.0.3", default-features = false, features = ["std"] }
+
+[package.metadata.risc0]
+methods = ["guest"]

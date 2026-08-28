@@ -27,9 +27,11 @@ impl ModeratorRegistry {
     /// This should be called after room creation.
     pub fn register_from_config(&mut self, config: &RoomConfig) {
         for pubkey in &config.moderator_pubkeys {
-            if !self.entries.iter().any(|e| {
-                e.room_id == config.room_id && e.moderator_pubkey == *pubkey
-            }) {
+            if !self
+                .entries
+                .iter()
+                .any(|e| e.room_id == config.room_id && e.moderator_pubkey == *pubkey)
+            {
                 self.entries.push(ModeratorEntry {
                     room_id: config.room_id,
                     moderator_pubkey: *pubkey,
@@ -56,11 +58,7 @@ impl ModeratorRegistry {
     }
 
     /// Deactivate a moderator for a room.
-    pub fn deactivate(
-        &mut self,
-        room_id: &[u8; 32],
-        pubkey: &[u8; 32],
-    ) -> Result<(), RoomError> {
+    pub fn deactivate(&mut self, room_id: &[u8; 32], pubkey: &[u8; 32]) -> Result<(), RoomError> {
         let entry = self
             .entries
             .iter_mut()

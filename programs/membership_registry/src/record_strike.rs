@@ -36,9 +36,10 @@ pub fn process_record_strike(
         return Err("Target identity is already revoked");
     }
 
-    let has_membership = forum.room_memberships.iter().any(|m| {
-        m.room_id == room_id && m.member_commitment == target_commitment && m.is_active
-    });
+    let has_membership = forum
+        .room_memberships
+        .iter()
+        .any(|m| m.room_id == room_id && m.member_commitment == target_commitment && m.is_active);
     if !has_membership {
         return Err("Target has no active membership in this room");
     }

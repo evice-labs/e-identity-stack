@@ -7,11 +7,12 @@ members = [
   "e_moderation_sdk",
   "e_identity_sdk",
   "programs/membership_registry",
+  "program_methods/guest",
 ]
 
 [workspace.dependencies]
-nssa_core = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.2.0", package = "lee_core" }
-nssa = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.2.0", package = "lee" }
+nssa_core = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.2.4", package = "lee_core" }
+nssa = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.2.4", package = "lee" }
 spel-framework = { git = "https://github.com/logos-co/spel", branch = "main" }
 
 sharks = "0.5.0"
