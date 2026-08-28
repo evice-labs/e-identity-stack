@@ -1,5 +1,5 @@
-use sha2::{Digest, Sha256};
 use e_moderation_sdk::crypto::signature::{PublicKey, Signature};
+use sha2::{Digest, Sha256};
 
 use crate::moderation::anti_sybil::ModerationError;
 use crate::room::moderator_registry::ModeratorRegistry;
@@ -79,8 +79,7 @@ pub fn sign_strike(
 
     let private_key = e_moderation_sdk::crypto::signature::PrivateKey::try_new(*moderator_nsk)
         .map_err(|_| ModerationError::InvalidModeratorSignature)?;
-    let pubkey =
-        e_moderation_sdk::crypto::signature::PublicKey::new_from_private_key(&private_key);
+    let pubkey = e_moderation_sdk::crypto::signature::PublicKey::new_from_private_key(&private_key);
     let signature = Signature::new(&private_key, &message);
 
     Ok(ModeratorSig {

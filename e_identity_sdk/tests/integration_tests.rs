@@ -67,12 +67,9 @@ fn test_multi_room_strike_to_slash_lifecycle() {
 
     // Target joins all 3 rooms with signed consent
     for room in [&room1, &room2, &room3] {
-        let join_sig = RoomRegistry::sign_join_consent(
-            &room.room_id,
-            &target_commitment,
-            &target_sk,
-        )
-        .expect("Sign join consent");
+        let join_sig =
+            RoomRegistry::sign_join_consent(&room.room_id, &target_commitment, &target_sk)
+                .expect("Sign join consent");
 
         room_registry
             .join_room(&room.room_id, target_commitment, &target_pk, join_sig, 50)
@@ -82,12 +79,8 @@ fn test_multi_room_strike_to_slash_lifecycle() {
     // Admin also joins all rooms (to meet min_room_members = 2)
     let admin_pk = ecdh::derive_xonly_pubkey(&admin_sk);
     for room in [&room1, &room2, &room3] {
-        let join_sig = RoomRegistry::sign_join_consent(
-            &room.room_id,
-            &admin_commitment,
-            &admin_sk,
-        )
-        .expect("Admin sign join consent");
+        let join_sig = RoomRegistry::sign_join_consent(&room.room_id, &admin_commitment, &admin_sk)
+            .expect("Admin sign join consent");
 
         room_registry
             .join_room(&room.room_id, admin_commitment, &admin_pk, join_sig, 51)
@@ -152,12 +145,18 @@ fn test_multi_room_strike_to_slash_lifecycle() {
         100,
         &[], // no previously used strike indexes
     );
-    assert!(result.is_ok(), "ReleaseShare validation should pass: {:?}", result);
+    assert!(
+        result.is_ok(),
+        "ReleaseShare validation should pass: {:?}",
+        result
+    );
 
     // Blacklist the commitment
     let mut blacklist = Blacklist::new();
     assert!(!blacklist.is_revoked(&target_commitment));
-    blacklist.revoke(target_commitment).expect("Revoke succeeds");
+    blacklist
+        .revoke(target_commitment)
+        .expect("Revoke succeeds");
     assert!(blacklist.is_revoked(&target_commitment));
 }
 
@@ -195,11 +194,17 @@ fn test_release_share_insufficient_room_diversity() {
     moderator_registry.register_from_config(&room);
 
     // Both users join
-    let join_sig = RoomRegistry::sign_join_consent(&room.room_id, &target_commitment, &target_sk).unwrap();
-    room_registry.join_room(&room.room_id, target_commitment, &target_pk, join_sig, 10).unwrap();
+    let join_sig =
+        RoomRegistry::sign_join_consent(&room.room_id, &target_commitment, &target_sk).unwrap();
+    room_registry
+        .join_room(&room.room_id, target_commitment, &target_pk, join_sig, 10)
+        .unwrap();
 
-    let admin_join = RoomRegistry::sign_join_consent(&room.room_id, &admin_commitment, &admin_sk).unwrap();
-    room_registry.join_room(&room.room_id, admin_commitment, &admin_pk, admin_join, 10).unwrap();
+    let admin_join =
+        RoomRegistry::sign_join_consent(&room.room_id, &admin_commitment, &admin_sk).unwrap();
+    room_registry
+        .join_room(&room.room_id, admin_commitment, &admin_pk, admin_join, 10)
+        .unwrap();
 
     // 3 strikes from same room
     let evidence = [0xBBu8; 32];
@@ -224,9 +229,15 @@ fn test_release_share_insufficient_room_diversity() {
     let validator = ReleaseShareValidator::new(3, anti_sybil);
     let result = validator.validate(&tx, &room_registry, &moderator_registry, 100, &[]);
 
-    assert!(result.is_err(), "Should fail due to insufficient room diversity");
+    assert!(
+        result.is_err(),
+        "Should fail due to insufficient room diversity"
+    );
     let err_msg = format!("{}", result.unwrap_err());
-    assert!(err_msg.contains("room diversity"), "Error should mention room diversity: {err_msg}");
+    assert!(
+        err_msg.contains("room diversity"),
+        "Error should mention room diversity: {err_msg}"
+    );
 }
 
 /// Test that immature rooms are rejected
@@ -262,11 +273,17 @@ fn test_release_share_immature_room_rejected() {
         .unwrap();
     moderator_registry.register_from_config(&room);
 
-    let join_sig = RoomRegistry::sign_join_consent(&room.room_id, &target_commitment, &target_sk).unwrap();
-    room_registry.join_room(&room.room_id, target_commitment, &target_pk, join_sig, 96).unwrap();
+    let join_sig =
+        RoomRegistry::sign_join_consent(&room.room_id, &target_commitment, &target_sk).unwrap();
+    room_registry
+        .join_room(&room.room_id, target_commitment, &target_pk, join_sig, 96)
+        .unwrap();
 
-    let admin_join = RoomRegistry::sign_join_consent(&room.room_id, &admin_commitment, &admin_sk).unwrap();
-    room_registry.join_room(&room.room_id, admin_commitment, &admin_pk, admin_join, 96).unwrap();
+    let admin_join =
+        RoomRegistry::sign_join_consent(&room.room_id, &admin_commitment, &admin_sk).unwrap();
+    room_registry
+        .join_room(&room.room_id, admin_commitment, &admin_pk, admin_join, 96)
+        .unwrap();
 
     let evidence = [0xCCu8; 32];
     let sig1 = sign_strike(&room.room_id, &target_commitment, &evidence, 0, &mod1_sk).unwrap();
@@ -291,5 +308,8 @@ fn test_release_share_immature_room_rejected() {
 
     assert!(result.is_err(), "Should fail due to immature room");
     let err_msg = format!("{}", result.unwrap_err());
-    assert!(err_msg.contains("mature"), "Error should mention maturity: {err_msg}");
+    assert!(
+        err_msg.contains("mature"),
+        "Error should mention maturity: {err_msg}"
+    );
 }

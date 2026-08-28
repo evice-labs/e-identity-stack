@@ -1,5 +1,5 @@
-use sha2::{Digest, Sha256};
 use e_moderation_sdk::crypto::signature::{PrivateKey, PublicKey, Signature};
+use sha2::{Digest, Sha256};
 
 use crate::identity::IdentityError;
 use crate::types::{MembershipRecord, RoomConfig};
@@ -168,7 +168,9 @@ impl RoomRegistry {
         let record = self
             .memberships
             .iter_mut()
-            .find(|m| m.room_id == *room_id && m.member_commitment == *member_commitment && m.is_active)
+            .find(|m| {
+                m.room_id == *room_id && m.member_commitment == *member_commitment && m.is_active
+            })
             .ok_or(RoomError::MemberNotFound)?;
         record.is_active = false;
         Ok(())
@@ -188,14 +190,10 @@ impl RoomRegistry {
     }
 
     /// Check if a commitment has an active membership in a room.
-    pub fn has_active_membership(
-        &self,
-        room_id: &[u8; 32],
-        member_commitment: &[u8; 32],
-    ) -> bool {
-        self.memberships
-            .iter()
-            .any(|m| m.room_id == *room_id && m.member_commitment == *member_commitment && m.is_active)
+    pub fn has_active_membership(&self, room_id: &[u8; 32], member_commitment: &[u8; 32]) -> bool {
+        self.memberships.iter().any(|m| {
+            m.room_id == *room_id && m.member_commitment == *member_commitment && m.is_active
+        })
     }
 
     /// Get all rooms.

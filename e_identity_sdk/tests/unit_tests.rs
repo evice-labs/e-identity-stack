@@ -1,12 +1,7 @@
 use e_identity_sdk::identity::{
-    verify_username_change, Blacklist, 
-    RegistrationClient, UsernameRegistry,
+    verify_username_change, Blacklist, RegistrationClient, UsernameRegistry,
 };
-use e_moderation_sdk::crypto::{
-    ecdh,
-    signature::PrivateKey,
-    sss::recover_secret,
-};
+use e_moderation_sdk::crypto::{ecdh, signature::PrivateKey, sss::recover_secret};
 
 #[test]
 fn test_registration_client_lifecycle() {
@@ -38,7 +33,8 @@ fn test_registration_client_lifecycle() {
     }
 
     // Recover NSK using 2 of 3 shares
-    let recovered_nsk = recover_secret(&decrypted_shares[0..2], 2).expect("Reconstruction succeeds");
+    let recovered_nsk =
+        recover_secret(&decrypted_shares[0..2], 2).expect("Reconstruction succeeds");
     assert_eq!(recovered_nsk, *client.nsk());
 }
 
@@ -53,7 +49,8 @@ fn test_username_change_verification() {
         .expect("Prepare username change succeeds");
 
     let priv_key = PrivateKey::try_new(sk_bytes).unwrap();
-    let pubkey_bytes = *e_moderation_sdk::crypto::signature::PublicKey::new_from_private_key(&priv_key).value();
+    let pubkey_bytes =
+        *e_moderation_sdk::crypto::signature::PublicKey::new_from_private_key(&priv_key).value();
 
     // Verify valid signature
     let verify_res = verify_username_change(
