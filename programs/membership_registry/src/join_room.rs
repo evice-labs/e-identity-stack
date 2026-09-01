@@ -13,12 +13,10 @@ pub fn process_join_room(
     room_id: [u8; 32],
     member_commitment: [u8; 32],
 ) -> Result<(), &'static str> {
-    // 1. Room must exist
     if !forum.rooms.iter().any(|r| r.room_id == room_id) {
         return Err("Room not found");
     }
 
-    // 2. Member must be registered and not revoked
     if !forum.registered_commitments.contains(&member_commitment) {
         return Err("Member commitment is not registered");
     }
@@ -26,7 +24,6 @@ pub fn process_join_room(
         return Err("Member identity has been revoked");
     }
 
-    // 3. No duplicate active membership
     let already_member = forum
         .room_memberships
         .iter()
