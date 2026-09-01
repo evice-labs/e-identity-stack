@@ -1,7 +1,7 @@
 #![no_main]
 
 use membership_registry::state::ForumInstance;
-use membership_registry::{initialize, record_strike, register, register_room, slash, verify_post};
+use membership_registry::{initialize, join_room, record_strike, register, register_room, slash, verify_post};
 use nssa_core::account::AccountWithMetadata;
 use spel_framework::prelude::*;
 
@@ -67,15 +67,17 @@ mod forum_registry {
             }
         })?;
 
-        let mut member = member;
-        let stake_u128 = stake_amount as u128;
-        if member.account.balance < stake_u128 {
-            return Err(spel_framework::error::SpelError::Custom {
-                code: 13,
-                message: "Insufficient balance for stake".into(),
-            });
-        }
-        member.account.balance -= stake_u128;
+        // TODO(stake): Re-enable once SPEL supports balance transfers from auth-transfer-owned accounts.
+        // LEZ Rule 5 blocks balance decreases on accounts not owned by the executing program.
+        // let mut member = member;
+        // let stake_u128 = stake_amount as u128;
+        // if member.account.balance < stake_u128 {
+        //     return Err(spel_framework::error::SpelError::Custom {
+        //         code: 13,
+        //         message: "Insufficient balance for stake".into(),
+        //     });
+        // }
+        // member.account.balance -= stake_u128;
 
         let mut state = state;
         state.account.data = borsh::to_vec(&forum)
@@ -89,10 +91,44 @@ mod forum_registry {
                 message: "Data too large".into(),
             })?;
 
-        Ok(SpelOutput::execute(
-            vec![state.account, member.account],
-            vec![],
-        ))
+        Ok(SpelOutput::execute(vec![state.account, member.account], vec![]))
+    }
+
+    #[instruction]
+    pub fn join_room(
+        #[account(mut, pda = [literal("forum"), arg("forum_id")])] state: AccountWithMetadata,
+        #[account(signer)] member: AccountWithMetadata,
+        forum_id: [u8; 32],
+        room_id: [u8; 32],
+        member_commitment: [u8; 32],
+    ) -> SpelResult {
+        let mut forum: ForumInstance = borsh::from_slice(&state.account.data).map_err(|_| {
+            spel_framework::error::SpelError::Custom {
+                code: 30,
+                message: "Deserialization error".into(),
+            }
+        })?;
+
+        join_room::process_join_room(&mut forum, room_id, member_commitment).map_err(|e| {
+            spel_framework::error::SpelError::Custom {
+                code: 31,
+                message: e.into(),
+            }
+        })?;
+
+        let mut state = state;
+        state.account.data = borsh::to_vec(&forum)
+            .map_err(|_| spel_framework::error::SpelError::Custom {
+                code: 32,
+                message: "Serialization error".into(),
+            })?
+            .try_into()
+            .map_err(|_| spel_framework::error::SpelError::Custom {
+                code: 33,
+                message: "Data too large".into(),
+            })?;
+
+        Ok(SpelOutput::execute(vec![state.account, member.account], vec![]))
     }
 
     #[instruction]
@@ -266,8 +302,9 @@ mod forum_registry {
             message: e.into(),
         })?;
 
-        let mut authority = authority;
-        authority.account.balance += confiscated as u128;
+        // TODO(stake): Re-enable once SPEL supports balance transfers from auth-transfer-owned accounts.
+        // let mut authority = authority;
+        // authority.account.balance += confiscated as u128;
 
         let mut state = state;
         state.account.data = borsh::to_vec(&forum)
@@ -281,9 +318,6 @@ mod forum_registry {
                 message: "Data too large".into(),
             })?;
 
-        Ok(SpelOutput::execute(
-            vec![state.account, authority.account],
-            vec![],
-        ))
+        Ok(SpelOutput::execute(vec![state.account, authority.account], vec![]))
     }
 }
