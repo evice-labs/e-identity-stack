@@ -87,14 +87,14 @@ The protocol uses a novel two-tier SSS construction to enable progressive identi
               │             │             │
          S_post(1)     S_post(2)     S_post(K)    ← one point per flagged post
               │             │             │
-        ┌─────┴─────┐ ┌────┴────┐  ┌─────┴─────┐
-        │ Tier-1 SSS│ │Tier-1   │  │ Tier-1    │  N-of-M per post
-        │ (per post)│ │(per post│  │ (per post)│  N = n_mod_threshold
-        └─────┬─────┘ └────┬───┘  └─────┬─────┘
+        ┌─────┴─────┐  ┌────┴────┐  ┌─────┴─────┐
+        │ Tier-1 SSS│  │Tier-1   │  │ Tier-1    │  N-of-M per post
+        │ (per post)│  │(per post│  │ (per post)│  N = n_mod_threshold
+        └─────┬─────┘  └────┬────┘  └─────┬─────┘
               │             │             │
-        ┌─────┼─────┐      ...     ┌─────┼─────┐
-        │     │     │              │     │     │
-      Mod₁  Mod₂  ModM          Mod₁  Mod₂  ModM   ← ECDH-encrypted shares
+        ┌─────┼─────┐      ...      ┌─────┼─────┐
+        │     │     │               │     │     │
+      Mod₁  Mod₂  ModM             Mod₁  Mod₂  ModM   ← ECDH-encrypted shares
 ```
 
 **Flow**:
