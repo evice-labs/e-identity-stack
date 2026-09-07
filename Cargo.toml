@@ -14,6 +14,7 @@ members = [
 nssa_core = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.2.4", package = "lee_core" }
 nssa = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.2.4", package = "lee" }
 spel-framework = { git = "https://github.com/logos-co/spel", branch = "main" }
+authenticated_transfer_core = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.2.4", package = "authenticated_transfer_core" }
 
 sharks = "0.5.0"
 sha2 = "0.11.0"
