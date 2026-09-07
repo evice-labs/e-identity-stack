@@ -94,7 +94,7 @@ The protocol uses a novel two-tier SSS construction to enable progressive identi
               │             │                │
         ┌─────┼─────┐      ...         ┌─────┼─────┐
         │     │     │                  │     │     │
-      Mod₁  Mod₂  ModM             Mod₁  Mod₂  ModM   ← ECDH-encrypted shares
+      Mod₁  Mod₂  ModM                Mod₁  Mod₂  ModM   ← ECDH-encrypted shares
 ```
 
 **Flow**:
