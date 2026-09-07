@@ -7,6 +7,7 @@ edition = "2021"
 nssa_core.workspace = true
 spel-framework.workspace = true
 membership_registry.workspace = true
+authenticated_transfer_core.workspace = true
 
 serde.workspace = true
 borsh.workspace = true
