@@ -83,18 +83,18 @@ The protocol uses a novel two-tier SSS construction to enable progressive identi
                     │  (at signup)  │  K = k_strikes threshold
                     └───────┬───────┘
                             │
-              ┌─────────────┼─────────────┐
-              │             │             │
-         S_post(1)     S_post(2)     S_post(K)    ← one point per flagged post
-              │             │             │
-        ┌─────┴─────┐  ┌────┴────┐  ┌─────┴─────┐
-        │ Tier-1 SSS│  │Tier-1   │  │ Tier-1    │  N-of-M per post
-        │ (per post)│  │(per post│  │ (per post)│  N = n_mod_threshold
-        └─────┬─────┘  └────┬────┘  └─────┬─────┘
-              │             │             │
-        ┌─────┼─────┐      ...      ┌─────┼─────┐
-        │     │     │               │     │     │
-      Mod₁  Mod₂  ModM             Mod₁  Mod₂  ModM   ← ECDH-encrypted shares
+              ┌─────────────┼───────────────┐
+              │             │               │
+         S_post(1)     S_post(2)       S_post(K)    ← one point per flagged post
+              │             │               │
+        ┌─────┴─────┐ ┌─────┴──────┐  ┌─────┴──────┐
+        │ Tier-1 SSS│ │   Tier-1   │  │ Tier-1     │  N-of-M per post
+        │ (per post)│ │ (per post) │  │ (per post) │  N = n_mod_threshold
+        └─────┬─────┘ └─────┬──────┘  └──────┬─────┘
+              │             │                │
+        ┌─────┼─────┐      ...         ┌─────┼─────┐
+        │     │     │                  │     │     │
+      Mod₁  Mod₂  ModM                Mod₁  Mod₂  ModM   ← ECDH-encrypted shares
 ```
 
 **Flow**:
@@ -282,7 +282,7 @@ spel --idl idl.json -p target/riscv32im-risc0-zkvm-elf/docker/membership_registr
   --member Public/<ACCOUNT_ID> \
   --forum-id <32-BYTE-HEX> \
   --commitment <32-BYTE-HEX> \
-  --stake-amount 0
+  --stake-amount 1000
 ```
 
 ### Step 3: Register Room
@@ -334,15 +334,15 @@ All 9 lifecycle steps were confirmed on the live **LEZ Testnet**:
 
 | # | Instruction | Transaction Hash | Status |
 |---|---|---|---|
-| 1 | Deploy Program | `0xe318804f...` | ✅ Block 27321 |
-| 2 | `initialize-forum` | `0x6f59c5f3...` | ✅ Confirmed |
-| 3 | `register-member` | `0x494ccc90...` | ✅ Confirmed |
-| 4 | `register-room` | `0x7ee5c78c...` | ✅ Confirmed |
-| 5 | `join-room` | `0xf5e44d15...` | ✅ Confirmed |
-| 6 | `record-strike` #1 | `0xdbe15142...` | ✅ Confirmed |
-| 7 | `record-strike` #2 | `0xc495b562...` | ✅ Confirmed |
-| 8 | `record-strike` #3 | `0x0479fb04...` | ✅ Confirmed |
-| 9 | `slash-member` | `0x110c2198...` | ✅ Confirmed |
+| 1 | Deploy Program | `0xe8af9dc3af21d369a26b9a494eef274d5b5a0720ca722c036d76965fe84a4889` | ✅ Block 41478 |
+| 2 | `initialize-forum` | `0x0336928961511b5d1a5ad50519978155c03824c4eb2832e6b4a5330d0b59da24` | ✅ Confirmed |
+| 3 | `register-member` (Stake 1000) | `0x2bcae58f49a5029a4bef4b55a6194d92147718ac739262a61fc56799962f5020` | ✅ Confirmed |
+| 4 | `register-room` | `0x921161cbe61eec1581a08d5da48b179d913ed123e23f43cd6af9301f5021e0e0` | ✅ Confirmed |
+| 5 | `join-room` | `0x253204c6f610ea7e5b0e5f41925fd672cb488139a6620e72c8ef186e0cae663c` | ✅ Confirmed |
+| 6 | `record-strike` #1 | `0x71bb08574c7cc2ce892f0955842f7219524caab01ce68c727c41fd3cdeed7df7` | ✅ Confirmed |
+| 7 | `record-strike` #2 | `0xd0a0b271abdf92a958508099a60391069ecd78327f32a33e4cba67f1e0b094f7` | ✅ Confirmed |
+| 8 | `record-strike` #3 | `0x56687a74822b0b397f2852a923f763b327c794cde7680f93b6e78a7f1b807f94` | ✅ Confirmed |
+| 9 | `slash-member` | `0x8479875cd6e08558bcef27311905fe3db4f594b48d8ffe63538690b2c80421a4` | ✅ Confirmed |
 
 Full transaction output available in [`docs/build_deploy_test_output.md`](docs/build_deploy_test_output.md).
 
@@ -350,7 +350,7 @@ Full transaction output available in [`docs/build_deploy_test_output.md`](docs/b
 
 1. **SPEL Macro Account Naming (`ExecuteTransformer`)**: Identifiers in `SpelOutput::execute(vec![state.account, member.account], vec![])` MUST match function argument names. Using clone names like `state_mut` disables auto-claim rewriting → Rule 7 rejection.
 
-2. **LEZ Rule 5 Balance Limitation (`TODO(stake)`)**: Programs cannot decrease balances on accounts owned by external programs. All funded accounts are `auth-transfer`-owned (required by `wallet pinata claim`). Stake deduction/confiscation is temporarily bypassed pending SPEL CPI guidelines.
+2. **Stake Collateral Model (LEZ Rule 5 Compliance)**: In accordance with LEZ Rule 5, third-party programs cannot decrease balances on accounts owned by other programs (such as `authenticated_transfer`). The registry enforces stake requirements by validating the member's wallet balance upon registration and maintaining collateral state directly inside the `ForumInstance` on-chain state (`member_stakes`, `total_staked`). Slashing revokes identity commitments and deducts forum stakes internally without requiring invalid cross-program balance mutations.
 
 3. **Signer Auto-Claim (SPEL PR [#262](https://github.com/logos-co/spel/pull/262))**: Signers are auto-claimed on first transaction via `AutoClaim::ClaimedIfDefault(Claim::Authorized)` to satisfy LEZ Rule 7.
 

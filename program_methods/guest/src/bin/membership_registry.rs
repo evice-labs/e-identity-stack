@@ -70,11 +70,10 @@ mod forum_registry {
             }
         })?;
 
-        // Stake deduction via chained call (CPI) to auth-transfer.
-        // LEZ Rule 5 only lets the owning program decrease a balance.
-        // Since the member account is owned by auth-transfer, we delegate
-        // the balance deduction instead of mutating it directly.
-        // See: https://github.com/logos-co/spel/pull/268
+        // Validate member has sufficient balance for the stake.
+        // The stake amount is recorded directly in the forum state as collateral.
+        // Confiscation on slashing is handled directly within the forum state,
+        // revoking identity and deducting total_staked without external CPI.
         let stake_u128 = stake_amount as u128;
         if member.account.balance < stake_u128 {
             return Err(spel_framework::error::SpelError::Custom {
@@ -82,19 +81,6 @@ mod forum_registry {
                 message: "Insufficient balance for stake".into(),
             });
         }
-
-        let auth_transfer_id: nssa_core::program::ProgramId = member.account.program_owner;
-
-        let mut authorized_member = member.clone();
-        authorized_member.is_authorized = true;
-
-        let stake_call = nssa_core::program::ChainedCall::new(
-            auth_transfer_id,
-            vec![authorized_member, state.clone()],
-            &authenticated_transfer_core::Instruction::Transfer {
-                amount: stake_u128,
-            },
-        );
 
         let mut state = state;
         state.account.data = borsh::to_vec(&forum)
@@ -108,11 +94,11 @@ mod forum_registry {
                 message: "Data too large".into(),
             })?;
 
-        // Member account is returned unchanged - the actual balance mutation
-        // is delegated to auth-transfer via the chained call.
+        // No chained calls - stake is recorded, not transferred.
+        // Balance serves as collateral until slashing.
         Ok(SpelOutput::execute(
             vec![state.account, member.account],
-            vec![stake_call],
+            vec![],
         ))
     }
 
@@ -289,16 +275,11 @@ mod forum_registry {
     }
 
     /// Slash a member identity: validate strike thresholds, revoke the commitment,
-    /// and confiscate stake via chained call (CPI) to auth-transfer.
-    ///
-    /// `target_member` is the on-chain account of the member being slashed.
-    /// The program validates that this account matches the target commitment,
-    /// then delegates the balance transfer (confiscation) to auth-transfer.
+    /// and confiscate stake in the forum instance state.
     #[instruction]
     pub fn slash_member(
         #[account(mut, pda = [literal("forum"), arg("forum_id")])] state: AccountWithMetadata,
         #[account(signer)] authority: AccountWithMetadata,
-        target_member: AccountWithMetadata,
         forum_id: [u8; 32],
         target_commitment: [u8; 32],
         k_rooms_min: u32,
@@ -319,7 +300,7 @@ mod forum_registry {
             });
         }
 
-        let confiscated = slash::process_slash(
+        slash::process_slash(
             &mut forum,
             target_commitment,
             k_rooms_min,
@@ -330,29 +311,6 @@ mod forum_registry {
             code: 7,
             message: e.into(),
         })?;
-
-        // Confiscate stake via chained call (CPI) to auth-transfer.
-        // Transfer confiscated amount from target_member to authority (admin).
-        // See: https://github.com/logos-co/spel/pull/268
-        let mut chained_calls = vec![];
-        if confiscated > 0 {
-            let auth_transfer_id: nssa_core::program::ProgramId =
-                target_member.account.program_owner;
-
-            let mut authorized_target = target_member.clone();
-            authorized_target.is_authorized = true;
-
-            let mut authorized_authority = authority.clone();
-            authorized_authority.is_authorized = true;
-
-            chained_calls.push(nssa_core::program::ChainedCall::new(
-                auth_transfer_id,
-                vec![authorized_target, authorized_authority],
-                &authenticated_transfer_core::Instruction::Transfer {
-                    amount: confiscated as u128,
-                },
-            ));
-        }
 
         let mut state = state;
         state.account.data = borsh::to_vec(&forum)
@@ -366,11 +324,9 @@ mod forum_registry {
                 message: "Data too large".into(),
             })?;
 
-        // Both target_member and authority are returned unchanged —
-        // the actual balance mutation is delegated to auth-transfer.
         Ok(SpelOutput::execute(
-            vec![state.account, authority.account, target_member.account],
-            chained_calls,
+            vec![state.account, authority.account],
+            vec![],
         ))
     }
 }
