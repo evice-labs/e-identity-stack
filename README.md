@@ -360,4 +360,9 @@ Full transaction output available in [`docs/build_deploy_test_output.md`](docs/b
 
 ## License
 
-Dual-licensed under MIT and Apache 2.0
+Dual-licensed under either of:
+
+- [MIT License](LICENSE-MIT)
+- [Apache License, Version 2.0](LICENSE-APACHE)
+
+at your option.
