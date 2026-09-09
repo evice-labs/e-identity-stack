@@ -13,6 +13,12 @@ pub fn process_register(
         return Err("Registration failed: This commitment is already registered.");
     }
 
+    // Reject commitments that were previously revoked via slashing.
+    // This prevents re-use of a compromised identity whose NSK was exposed.
+    if forum.revoked_commitments.contains(&commitment_bytes) {
+        return Err("Registration failed: This commitment has been revoked.");
+    }
+
     forum.registered_commitments.push(commitment_bytes);
     forum.member_stakes.push((commitment_bytes, stake_amount));
     forum.total_staked += stake_amount;
