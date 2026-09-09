@@ -1,9 +1,8 @@
 #![no_main]
 
-use membership_registry::{ 
-    state::ForumInstance,
-    initialize, join_room, record_strike, register, 
-    register_room, slash, verify_post,
+use membership_registry::{
+    initialize, join_room, record_strike, register, register_room, slash, state::ForumInstance,
+    verify_post,
 };
 use nssa_core::account::AccountWithMetadata;
 use spel_framework::prelude::*;
@@ -136,7 +135,10 @@ mod forum_registry {
                 message: "Data too large".into(),
             })?;
 
-        Ok(SpelOutput::execute(vec![state.account, member.account], vec![]))
+        Ok(SpelOutput::execute(
+            vec![state.account, member.account],
+            vec![],
+        ))
     }
 
     #[instruction]

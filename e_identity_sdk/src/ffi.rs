@@ -262,7 +262,10 @@ pub unsafe extern "C" fn ffi_username_registry_lookup_by_username(
         Err(_) => return error_json("invalid UTF-8"),
     };
     match (*handle).inner.lookup_by_username(name) {
-        Some(commitment) => ok_json(&format!("{{\"commitment\":\"{}\"}}", hex::encode(commitment))),
+        Some(commitment) => ok_json(&format!(
+            "{{\"commitment\":\"{}\"}}",
+            hex::encode(commitment)
+        )),
         None => ok_json("{\"commitment\":null}"),
     }
 }
