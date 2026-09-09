@@ -25,3 +25,46 @@ pub fn process_register(
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::initialize::process_initialize;
+
+    #[test]
+    fn test_register_success() {
+        let mut forum = process_initialize(3, 2, 3).unwrap();
+        let commitment = [1u8; 32];
+        assert!(process_register(&mut forum, commitment, 1000).is_ok());
+        assert_eq!(forum.registered_commitments.len(), 1);
+        assert_eq!(forum.total_staked, 1000);
+    }
+
+    #[test]
+    fn test_register_insufficient_stake() {
+        let mut forum = process_initialize(3, 2, 3).unwrap();
+        let commitment = [1u8; 32];
+        assert!(process_register(&mut forum, commitment, 999).is_err());
+    }
+
+    #[test]
+    fn test_register_duplicate_commitment() {
+        let mut forum = process_initialize(3, 2, 3).unwrap();
+        let commitment = [1u8; 32];
+        assert!(process_register(&mut forum, commitment, 1000).is_ok());
+        assert!(process_register(&mut forum, commitment, 1000).is_err());
+    }
+
+    #[test]
+    fn test_register_revoked_commitment_rejected() {
+        let mut forum = process_initialize(3, 2, 3).unwrap();
+        let commitment = [2u8; 32];
+        forum.revoked_commitments.push(commitment);
+        let res = process_register(&mut forum, commitment, 1000);
+        assert!(res.is_err());
+        assert_eq!(
+            res.unwrap_err(),
+            "Registration failed: This commitment has been revoked."
+        );
+    }
+}

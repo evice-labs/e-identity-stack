@@ -1,6 +1,6 @@
 use crate::state::{ForumInstance, OnChainMembership};
 
-/// Process a room join instruction. 
+/// Process a room join instruction.
 /// Validates that:
 /// 1. The room exists on-chain
 /// 2. The member commitment is registered and not revoked
