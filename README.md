@@ -1,4 +1,6 @@
-# E-Identity-Stack
+# eIdentityStack
+
+*Built by Evice Labs*
 
 Privacy-preserving anonymous identity registry, room management, and strike-based moderation infrastructure built for the **Logos Execution Zone (LEZ)** testnet using **SPEL (Smart Program Execution Layer)** and **RISC0 ZKVM**.
 
@@ -360,9 +362,16 @@ Full transaction output available in [`docs/build_deploy_test_output.md`](docs/b
 
 ## License
 
-Dual-licensed under either of:
+This project is licensed under the **Business Source License 1.1 (BSL 1.1)**.
 
-- [MIT License](LICENSE-MIT)
-- [Apache License, Version 2.0](LICENSE-APACHE)
+- **Free for non-commercial use**, evaluation, personal privacy, academic research, and public security audits.
+- **Commercial deployment or SaaS hosting** requires a commercial license agreement from **Evice Labs**.
+- Effective **September 12, 2029**, this work converts automatically to the **Apache License, Version 2.0**.
 
-at your option.
+See the full [LICENSE](LICENSE) file for terms and conditions.
+
+---
+
+<p align="center">
+  Copyright &copy; 2026 <strong>Evice Labs</strong>. All rights reserved.
+</p>
