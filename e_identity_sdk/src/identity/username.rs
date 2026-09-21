@@ -3,6 +3,24 @@ use sha2::{Digest, Sha256};
 
 use crate::identity::registration::IdentityError;
 
+/// Validate username syntax: 3..=32 characters, ASCII alphanumeric or underscore.
+pub fn validate_username_format(username: &str) -> Result<(), IdentityError> {
+    if username.len() < 3 || username.len() > 32 {
+        return Err(IdentityError::InvalidUsername(
+            "Username must be between 3 and 32 characters",
+        ));
+    }
+    if !username
+        .chars()
+        .all(|c| c.is_ascii_alphanumeric() || c == '_')
+    {
+        return Err(IdentityError::InvalidUsername(
+            "Username can only contain alphanumeric characters and underscores",
+        ));
+    }
+    Ok(())
+}
+
 /// Verifies that a username change request is legitimate.
 ///
 /// The owner must provide a Schnorr signature over SHA256(commitment || new_username)
@@ -13,6 +31,8 @@ pub fn verify_username_change(
     ownership_signature: &[u8; 64],
     owner_pubkey: &[u8; 32],
 ) -> Result<(), IdentityError> {
+    validate_username_format(new_username)?;
+
     // Reconstruct the signed message
     let mut hasher = Sha256::new();
     hasher.update(commitment);
@@ -52,19 +72,19 @@ impl UsernameRegistry {
     }
 
     /// Register a new username for a commitment.
-    /// Returns error if the username is already taken.
+    /// Returns error if the username is already taken (case-insensitive).
     pub fn register(
         &mut self,
         commitment: [u8; 32],
         username: String,
     ) -> Result<(), IdentityError> {
-        if username.is_empty() || username.len() > 64 {
-            return Err(IdentityError::InvalidUsername(
-                "Username must be between 1 and 64 characters",
-            ));
-        }
+        validate_username_format(&username)?;
 
-        if self.entries.iter().any(|e| e.username == username) {
+        if self
+            .entries
+            .iter()
+            .any(|e| e.username.eq_ignore_ascii_case(&username))
+        {
             return Err(IdentityError::InvalidUsername("Username already taken"));
         }
 
@@ -82,16 +102,12 @@ impl UsernameRegistry {
         commitment: &[u8; 32],
         new_username: String,
     ) -> Result<(), IdentityError> {
-        if new_username.is_empty() || new_username.len() > 64 {
-            return Err(IdentityError::InvalidUsername(
-                "Username must be between 1 and 64 characters",
-            ));
-        }
+        validate_username_format(&new_username)?;
 
         if self
             .entries
             .iter()
-            .any(|e| e.username == new_username && e.commitment != *commitment)
+            .any(|e| e.username.eq_ignore_ascii_case(&new_username) && e.commitment != *commitment)
         {
             return Err(IdentityError::InvalidUsername("Username already taken"));
         }
@@ -118,11 +134,11 @@ impl UsernameRegistry {
             .map(|e| e.username.as_str())
     }
 
-    /// Lookup commitment by username.
+    /// Lookup commitment by username (case-insensitive).
     pub fn lookup_by_username(&self, username: &str) -> Option<&[u8; 32]> {
         self.entries
             .iter()
-            .find(|e| e.username == username)
+            .find(|e| e.username.eq_ignore_ascii_case(username))
             .map(|e| &e.commitment)
     }
 }

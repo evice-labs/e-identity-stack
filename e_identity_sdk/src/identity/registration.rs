@@ -1,3 +1,4 @@
+use crate::identity::username::validate_username_format;
 use e_moderation_sdk::crypto::ecdh;
 use e_moderation_sdk::crypto::sss::split_secret;
 use rand::Rng;
@@ -88,11 +89,7 @@ impl RegistrationClient {
         node_pubkeys: &[[u8; 32]],
         k_sss_threshold: u32,
     ) -> Result<RegistrationPayload, IdentityError> {
-        if username.is_empty() || username.len() > 64 {
-            return Err(IdentityError::InvalidUsername(
-                "Username must be between 1 and 64 characters",
-            ));
-        }
+        validate_username_format(username)?;
 
         let total_nodes = node_pubkeys.len() as u32;
         let shares = split_secret(&self.nsk, k_sss_threshold, total_nodes)
@@ -131,11 +128,7 @@ impl RegistrationClient {
         &self,
         new_username: &str,
     ) -> Result<UsernameChangePayload, IdentityError> {
-        if new_username.is_empty() || new_username.len() > 64 {
-            return Err(IdentityError::InvalidUsername(
-                "Username must be between 1 and 64 characters",
-            ));
-        }
+        validate_username_format(new_username)?;
 
         // Construct message: SHA256(commitment || new_username)
         let mut hasher = Sha256::new();

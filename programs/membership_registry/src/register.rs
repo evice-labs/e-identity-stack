@@ -5,8 +5,8 @@ pub fn process_register(
     commitment_bytes: [u8; 32],
     stake_amount: u64,
 ) -> Result<(), &'static str> {
-    if stake_amount < 1000 {
-        return Err("Registration failed: Stake amount is below the minimum limit (1000).");
+    if stake_amount < 150 {
+        return Err("Registration failed: Stake amount is below the minimum limit (150).");
     }
 
     if forum.registered_commitments.contains(&commitment_bytes) {
@@ -35,24 +35,24 @@ mod tests {
     fn test_register_success() {
         let mut forum = process_initialize(3, 2, 3).unwrap();
         let commitment = [1u8; 32];
-        assert!(process_register(&mut forum, commitment, 1000).is_ok());
+        assert!(process_register(&mut forum, commitment, 150).is_ok());
         assert_eq!(forum.registered_commitments.len(), 1);
-        assert_eq!(forum.total_staked, 1000);
+        assert_eq!(forum.total_staked, 150);
     }
 
     #[test]
     fn test_register_insufficient_stake() {
         let mut forum = process_initialize(3, 2, 3).unwrap();
         let commitment = [1u8; 32];
-        assert!(process_register(&mut forum, commitment, 999).is_err());
+        assert!(process_register(&mut forum, commitment, 149).is_err());
     }
 
     #[test]
     fn test_register_duplicate_commitment() {
         let mut forum = process_initialize(3, 2, 3).unwrap();
         let commitment = [1u8; 32];
-        assert!(process_register(&mut forum, commitment, 1000).is_ok());
-        assert!(process_register(&mut forum, commitment, 1000).is_err());
+        assert!(process_register(&mut forum, commitment, 150).is_ok());
+        assert!(process_register(&mut forum, commitment, 150).is_err());
     }
 
     #[test]
@@ -60,7 +60,7 @@ mod tests {
         let mut forum = process_initialize(3, 2, 3).unwrap();
         let commitment = [2u8; 32];
         forum.revoked_commitments.push(commitment);
-        let res = process_register(&mut forum, commitment, 1000);
+        let res = process_register(&mut forum, commitment, 150);
         assert!(res.is_err());
         assert_eq!(
             res.unwrap_err(),
