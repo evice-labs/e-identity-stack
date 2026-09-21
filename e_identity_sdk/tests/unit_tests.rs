@@ -81,10 +81,28 @@ fn test_username_registry() {
     let comm_2 = [2u8; 32];
 
     assert!(registry.register(comm_1, "bob".to_string()).is_ok());
-    assert!(registry.register(comm_2, "bob".to_string()).is_err()); // Duplicate username
+    assert!(registry.register(comm_2, "bob".to_string()).is_err()); // Exact duplicate
+    assert!(registry.register(comm_2, "Bob".to_string()).is_err()); // Case-insensitive duplicate
+    assert!(registry.register(comm_2, "BOB".to_string()).is_err()); // Uppercase duplicate
+
+    // Syafiqeil vs syafiqeil collision test
+    let comm_3 = [3u8; 32];
+    let comm_4 = [4u8; 32];
+    assert!(registry.register(comm_3, "Syafiqeil".to_string()).is_ok());
+    assert!(registry.register(comm_4, "syafiqeil".to_string()).is_err()); // Lowercase variation rejected!
+    assert_eq!(registry.lookup_by_username("syafiqeil"), Some(&comm_3)); // Case-insensitive lookup works
+    assert_eq!(registry.lookup_by_username("SYAFIQEIL"), Some(&comm_3));
+
+    // Format & syntax validations
+    let comm_bad = [5u8; 32];
+    assert!(registry.register(comm_bad, "ab".to_string()).is_err()); // < 3 chars
+    assert!(registry.register(comm_bad, "has space".to_string()).is_err()); // space disallowed
+    assert!(registry.register(comm_bad, "bad@user".to_string()).is_err()); // symbol disallowed
+    assert!(registry.register(comm_bad, "valid_user_123".to_string()).is_ok());
 
     assert_eq!(registry.lookup_by_commitment(&comm_1), Some("bob"));
     assert_eq!(registry.lookup_by_username("bob"), Some(&comm_1));
+    assert_eq!(registry.lookup_by_username("Bob"), Some(&comm_1));
 
     assert!(registry.update(&comm_1, "bob_new".to_string()).is_ok());
     assert_eq!(registry.lookup_by_commitment(&comm_1), Some("bob_new"));
