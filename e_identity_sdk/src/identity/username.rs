@@ -10,7 +10,10 @@ pub fn validate_username_format(username: &str) -> Result<(), IdentityError> {
             "Username must be between 3 and 32 characters",
         ));
     }
-    if !username.chars().all(|c| c.is_ascii_alphanumeric() || c == '_') {
+    if !username
+        .chars()
+        .all(|c| c.is_ascii_alphanumeric() || c == '_')
+    {
         return Err(IdentityError::InvalidUsername(
             "Username can only contain alphanumeric characters and underscores",
         ));
@@ -77,7 +80,11 @@ impl UsernameRegistry {
     ) -> Result<(), IdentityError> {
         validate_username_format(&username)?;
 
-        if self.entries.iter().any(|e| e.username.eq_ignore_ascii_case(&username)) {
+        if self
+            .entries
+            .iter()
+            .any(|e| e.username.eq_ignore_ascii_case(&username))
+        {
             return Err(IdentityError::InvalidUsername("Username already taken"));
         }
 

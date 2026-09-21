@@ -96,9 +96,13 @@ fn test_username_registry() {
     // Format & syntax validations
     let comm_bad = [5u8; 32];
     assert!(registry.register(comm_bad, "ab".to_string()).is_err()); // < 3 chars
-    assert!(registry.register(comm_bad, "has space".to_string()).is_err()); // space disallowed
+    assert!(registry
+        .register(comm_bad, "has space".to_string())
+        .is_err()); // space disallowed
     assert!(registry.register(comm_bad, "bad@user".to_string()).is_err()); // symbol disallowed
-    assert!(registry.register(comm_bad, "valid_user_123".to_string()).is_ok());
+    assert!(registry
+        .register(comm_bad, "valid_user_123".to_string())
+        .is_ok());
 
     assert_eq!(registry.lookup_by_commitment(&comm_1), Some("bob"));
     assert_eq!(registry.lookup_by_username("bob"), Some(&comm_1));
