@@ -1,6 +1,4 @@
-# eIdentityStack
-
-*Built by Evice Labs*
+# Evice Identity Stack
 
 Privacy-preserving anonymous identity registry, room management, and strike-based moderation infrastructure built for the **Logos Execution Zone (LEZ)** testnet using **SPEL (Smart Program Execution Layer)** and **RISC0 ZKVM**.
 
@@ -207,6 +205,12 @@ Manages identity lifecycle:
 - Prepares registration payload with Tier-2 SSS shares encrypted to node public keys
 - Signs username change proofs via BIP-340 Schnorr
 
+### `UsernameRegistry` (`e_identity_sdk`)
+Maintains pseudonym bindings and enforces protocol invariants:
+- **Case-Insensitive Uniqueness**: Prevents homograph and impersonation attacks (e.g., `Syafiqeil` and `syafiqeil` collide and reject as already taken).
+- **Format Validation**: Strict enforcement of 3–32 ASCII alphanumeric characters and underscores (`[a-zA-Z0-9_]`).
+- **Cryptographic Ownership**: Verifies BIP-340 Schnorr signatures over `SHA256(commitment || new_username)` before username updates.
+
 ### `ReleaseShareValidator` (`e_identity_sdk`)
 Full 7-step anti-Sybil validation for slashing transactions:
 1. K strike certificates present
@@ -284,7 +288,7 @@ spel --idl idl.json -p target/riscv32im-risc0-zkvm-elf/docker/membership_registr
   --member Public/<ACCOUNT_ID> \
   --forum-id <32-BYTE-HEX> \
   --commitment <32-BYTE-HEX> \
-  --stake-amount 1000
+  --stake-amount 150
 ```
 
 ### Step 3: Register Room
