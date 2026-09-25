@@ -20,7 +20,7 @@ pub struct FfiSlashAggregator {
     inner: SlashAggregator,
 }
 
-// 1. Helper
+// HELPERS
 
 /// Return a JSON string to C. Caller must free with ffi_free_string.
 fn to_c_string(s: &str) -> *mut c_char {
@@ -41,7 +41,7 @@ pub extern "C" fn ffi_free_string(ptr: *mut c_char) {
     }
 }
 
-// 2. MemberClient FFI
+// MEMBER CLIENT FFI
 
 #[no_mangle]
 pub unsafe extern "C" fn ffi_member_new(
@@ -111,7 +111,7 @@ pub unsafe extern "C" fn ffi_member_prepare_post(
     }
 }
 
-// 3. ModeratorClient FFI
+// MODERATOR CLIENT FFI
 
 #[no_mangle]
 pub unsafe extern "C" fn ffi_moderator_new(privkey_ptr: *const u8) -> *mut FfiModeratorClient {
@@ -181,7 +181,7 @@ pub unsafe extern "C" fn ffi_moderator_issue_strike(
     }
 }
 
-// 4. SlashAggregator FFI
+// SLASH AGGREGATOR FFI
 
 #[no_mangle]
 pub unsafe extern "C" fn ffi_aggregator_new(
