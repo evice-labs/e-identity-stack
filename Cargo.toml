@@ -6,6 +6,7 @@ license-file = "LICENSE"
 resolver = "2"
 members = [
   "e_moderation_sdk",
+  "e_chat_bridge",
   "e_identity_sdk",
   "programs/membership_registry",
   "program_methods/guest",
@@ -32,6 +33,7 @@ serde = { version = "1.0.60", default-features = false, features = ["derive"] }
 serde_json = "1.0.81"
 serde_with = "3.16.1"
 borsh = "1.5.7"
+prost = "0.14"
 hex = "0.4.3"
 rand = { version = "0.10.2", features = ["std", "std_rng"] }
 thiserror = "2.0"

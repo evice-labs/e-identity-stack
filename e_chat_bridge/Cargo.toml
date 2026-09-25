@@ -1,0 +1,23 @@
+[package]
+name = "e_chat_bridge"
+version = "0.1.0"
+edition = "2021"
+[lib]
+crate-type = ["lib", "cdylib"]
+
+[dependencies]
+de-mls = { git = "https://github.com/vacp2p/de-mls.git" }
+e_identity_sdk = { path = "../e_identity_sdk" }
+e_moderation_sdk = { path = "../e_moderation_sdk" }
+
+openmls = "0.8.1"
+openmls_traits = "0.5.0"
+openmls_basic_credential = { version = "0.5.0", features = ["clonable"] }
+openmls_rust_crypto = "0.5.1"
+
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+hex = { workspace = true }
+thiserror = { workspace = true }
+prost = { workspace = true }

@@ -21,7 +21,7 @@ use crate::room::management::RoomRegistry;
 use crate::room::moderator_registry::ModeratorRegistry;
 use crate::types::StrikeCertificate;
 
-// 1. Helpers
+// HELPERS
 
 fn to_c_string(s: &str) -> *mut c_char {
     CString::new(s).unwrap_or_default().into_raw()
@@ -61,7 +61,7 @@ pub extern "C" fn ffi_identity_free_string(ptr: *mut c_char) {
     }
 }
 
-// 2. RegistrationClient
+// REGISTRATION CLIENT
 
 pub struct FfiRegistrationClient {
     inner: RegistrationClient,
@@ -190,7 +190,7 @@ pub unsafe extern "C" fn ffi_registration_prepare_username_change(
     }
 }
 
-// 3. UsernameRegistry
+// USERNAME REGISTRY
 
 pub struct FfiUsernameRegistry {
     inner: UsernameRegistry,
@@ -270,7 +270,7 @@ pub unsafe extern "C" fn ffi_username_registry_lookup_by_username(
     }
 }
 
-// 4. Blacklist
+// BLACKLIST
 
 pub struct FfiBlacklist {
     inner: Blacklist,
@@ -332,7 +332,7 @@ pub unsafe extern "C" fn ffi_blacklist_len(handle: *const FfiBlacklist) -> i32 {
     (*handle).inner.len() as i32
 }
 
-// 5. RoomRegistry
+// ROOM REGISTRY
 
 pub struct FfiRoomRegistry {
     inner: RoomRegistry,
@@ -505,7 +505,7 @@ pub unsafe extern "C" fn ffi_room_registry_has_active_membership(
     }
 }
 
-// 6. ModeratorRegistry
+// MODERATOR REGISTRY
 
 pub struct FfiModeratorRegistry {
     inner: ModeratorRegistry,
@@ -578,7 +578,7 @@ pub unsafe extern "C" fn ffi_moderator_registry_active_count(
     (*handle).inner.active_count(&room_id) as i32
 }
 
-// 7. Strike Operations
+// STRIKE OPERATIONS
 
 /// Sign a strike as a moderator. Returns JSON `ModeratorSig`.
 #[no_mangle]
@@ -653,7 +653,7 @@ pub unsafe extern "C" fn ffi_strike_validate(
     }
 }
 
-// 8. ReleaseShareValidator
+// RELEASE SHARE VALIDATOR
 
 pub struct FfiReleaseShareValidator {
     inner: ReleaseShareValidator,
