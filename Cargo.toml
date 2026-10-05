@@ -10,9 +10,17 @@ members = [
   "e_identity_sdk",
   "programs/membership_registry",
   "program_methods/guest",
+  "tools/dispatcher",
 ]
 
 [workspace.dependencies]
+lee_core = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.3.0", package = "lee_core" }
+lee = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.3.0", package = "lee" }
+common = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.3.0", package = "common" }
+wallet = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.3.0", package = "wallet" }
+sequencer_service_rpc = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.3.0", package = "sequencer_service_rpc" }
+program_loader_core = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.3.0", package = "program_loader_core" }
+
 nssa_core = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.2.4", package = "lee_core" }
 nssa = { git = "https://github.com/logos-blockchain/logos-execution-zone.git", tag = "v0.2.4", package = "lee" }
 spel-framework = { git = "https://github.com/logos-co/spel", branch = "main" }
@@ -37,6 +45,9 @@ prost = "0.14"
 hex = "0.4.3"
 rand = { version = "0.10.2", features = ["std", "std_rng"] }
 thiserror = "2.0"
+clap = { version = "4.5", features = ["derive"] }
+tokio = { version = "1.28", features = ["full"] }
+anyhow = "1.0"
 
 e_moderation_sdk = { path = "e_moderation_sdk" }
 e_identity_sdk = { path = "e_identity_sdk" }
