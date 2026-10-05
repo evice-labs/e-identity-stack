@@ -138,7 +138,10 @@ fn parse_hex_32(hex_str: &str, field_name: &str) -> Result<[u8; 32]> {
     let clean = hex_str.trim_start_matches("0x").trim();
     let bytes = hex::decode(clean).context(format!("Invalid hex for {field_name}"))?;
     if bytes.len() != 32 {
-        anyhow::bail!("{field_name} must be exactly 32 bytes (64 hex characters), got {}", bytes.len());
+        anyhow::bail!(
+            "{field_name} must be exactly 32 bytes (64 hex characters), got {}",
+            bytes.len()
+        );
     }
     let mut arr = [0u8; 32];
     arr.copy_from_slice(&bytes);
@@ -161,7 +164,11 @@ fn encode_register_username(forum_id: &[u8; 32], commitment: &[u8; 32], username
     data
 }
 
-fn encode_register_member(forum_id: &[u8; 32], commitment: &[u8; 32], stake_amount: u64) -> Vec<u8> {
+fn encode_register_member(
+    forum_id: &[u8; 32],
+    commitment: &[u8; 32],
+    stake_amount: u64,
+) -> Vec<u8> {
     let mut data = Vec::new();
     encode_u32_word(1, &mut data); // instruction index 1
     for &b in forum_id {
@@ -175,7 +182,12 @@ fn encode_register_member(forum_id: &[u8; 32], commitment: &[u8; 32], stake_amou
     data
 }
 
-fn encode_initialize_forum(forum_id: &[u8; 32], k_strikes: u32, n_moderators: u32, m_moderators: u32) -> Vec<u8> {
+fn encode_initialize_forum(
+    forum_id: &[u8; 32],
+    k_strikes: u32,
+    n_moderators: u32,
+    m_moderators: u32,
+) -> Vec<u8> {
     let mut data = Vec::new();
     encode_u32_word(0, &mut data); // instruction index 0
     for &b in forum_id {
@@ -194,7 +206,9 @@ async fn execute_tx(
     payer_str: Option<&str>,
     is_json: bool,
 ) -> Result<()> {
-    let wallet_core = WalletCore::from_env().await.context("Failed to init wallet")?;
+    let wallet_core = WalletCore::from_env()
+        .await
+        .context("Failed to init wallet")?;
 
     let program_mention =
         CliAccountMention::from_str(program_str).map_err(|e| anyhow::anyhow!("{e}"))?;
@@ -210,15 +224,11 @@ async fn execute_tx(
         } else {
             (trimmed, None)
         };
-        let mention =
-            CliAccountMention::from_str(clean).map_err(|e| anyhow::anyhow!("{e}"))?;
+        let mention = CliAccountMention::from_str(clean).map_err(|e| anyhow::anyhow!("{e}"))?;
         let resolved = mention.resolve(wallet_core.storage())?;
         let id = extract_account_id(resolved);
-        let should_sign = force_sign.unwrap_or_else(|| {
-            wallet_core
-                .get_account_public_signing_key(id)
-                .is_some()
-        });
+        let should_sign =
+            force_sign.unwrap_or_else(|| wallet_core.get_account_public_signing_key(id).is_some());
         let identity = if should_sign {
             wallet::AccountIdentity::Public(id)
         } else {
@@ -253,11 +263,14 @@ async fn execute_tx(
         .context("Transaction confirmation error")?;
 
     if is_json {
-        println!("{}", json!({
-            "ok": true,
-            "tx_hash": tx_hash.to_string(),
-            "block_id": block_id.to_string()
-        }));
+        println!(
+            "{}",
+            json!({
+                "ok": true,
+                "tx_hash": tx_hash.to_string(),
+                "block_id": block_id.to_string()
+            })
+        );
     } else {
         println!("✅ Confirmed on-chain! tx_hash={tx_hash} block_id={block_id}");
     }
@@ -268,7 +281,9 @@ async fn execute_tx(
 async fn main() -> Result<()> {
     let cli = Cli::parse();
     let deployments = get_deployments();
-    let wallet_core = WalletCore::from_env().await.context("Failed to init wallet")?;
+    let wallet_core = WalletCore::from_env()
+        .await
+        .context("Failed to init wallet")?;
 
     let resolve_payer = |p_opt: Option<String>| -> Result<String> {
         if let Some(p) = p_opt {
@@ -284,9 +299,13 @@ async fn main() -> Result<()> {
         }
     };
 
-    let resolve_program_and_pda = |prog_opt: Option<String>, forum_id_bytes: &[u8; 32], pda_opt: Option<String>| -> Result<(String, String)> {
+    let resolve_program_and_pda = |prog_opt: Option<String>,
+                                   forum_id_bytes: &[u8; 32],
+                                   pda_opt: Option<String>|
+     -> Result<(String, String)> {
         let prog = prog_opt.unwrap_or_else(|| deployments.program_header.clone());
-        let program_mention = CliAccountMention::from_str(&prog).map_err(|e| anyhow::anyhow!("{e}"))?;
+        let program_mention =
+            CliAccountMention::from_str(&prog).map_err(|e| anyhow::anyhow!("{e}"))?;
         let prog_id = extract_account_id(program_mention.resolve(wallet_core.storage())?);
 
         let pda_str = if let Some(pda) = pda_opt {
@@ -311,7 +330,8 @@ async fn main() -> Result<()> {
         }) => {
             let forum_id_str = forum_id.unwrap_or_else(|| deployments.default_forum_id.clone());
             let forum_id_bytes = parse_hex_32(&forum_id_str, "forum_id")?;
-            let (effective_program, effective_forum_pda) = resolve_program_and_pda(program, &forum_id_bytes, forum_pda)?;
+            let (effective_program, effective_forum_pda) =
+                resolve_program_and_pda(program, &forum_id_bytes, forum_pda)?;
             let commitment_bytes = parse_hex_32(&commitment, "commitment")?;
             let data = encode_register_username(&forum_id_bytes, &commitment_bytes, &username);
             let effective_payer = resolve_payer(payer)?;
@@ -319,7 +339,14 @@ async fn main() -> Result<()> {
                 format!("{effective_forum_pda}:nosign"),
                 format!("{effective_payer}:sign"),
             ];
-            execute_tx(&effective_program, &accounts, data, Some(&effective_payer), json).await
+            execute_tx(
+                &effective_program,
+                &accounts,
+                data,
+                Some(&effective_payer),
+                json,
+            )
+            .await
         }
         Some(Commands::RegisterMember {
             commitment,
@@ -332,7 +359,8 @@ async fn main() -> Result<()> {
         }) => {
             let forum_id_str = forum_id.unwrap_or_else(|| deployments.default_forum_id.clone());
             let forum_id_bytes = parse_hex_32(&forum_id_str, "forum_id")?;
-            let (effective_program, effective_forum_pda) = resolve_program_and_pda(program, &forum_id_bytes, forum_pda)?;
+            let (effective_program, effective_forum_pda) =
+                resolve_program_and_pda(program, &forum_id_bytes, forum_pda)?;
             let commitment_bytes = parse_hex_32(&commitment, "commitment")?;
             let data = encode_register_member(&forum_id_bytes, &commitment_bytes, stake_amount);
             let effective_payer = resolve_payer(payer)?;
@@ -340,7 +368,14 @@ async fn main() -> Result<()> {
                 format!("{effective_forum_pda}:nosign"),
                 format!("{effective_payer}:sign"),
             ];
-            execute_tx(&effective_program, &accounts, data, Some(&effective_payer), json).await
+            execute_tx(
+                &effective_program,
+                &accounts,
+                data,
+                Some(&effective_payer),
+                json,
+            )
+            .await
         }
         Some(Commands::InitializeForum {
             forum_id,
@@ -354,14 +389,23 @@ async fn main() -> Result<()> {
         }) => {
             let forum_id_str = forum_id.unwrap_or_else(|| deployments.default_forum_id.clone());
             let forum_id_bytes = parse_hex_32(&forum_id_str, "forum_id")?;
-            let (effective_program, effective_forum_pda) = resolve_program_and_pda(program, &forum_id_bytes, forum_pda)?;
-            let data = encode_initialize_forum(&forum_id_bytes, k_strikes, n_moderators, m_moderators);
+            let (effective_program, effective_forum_pda) =
+                resolve_program_and_pda(program, &forum_id_bytes, forum_pda)?;
+            let data =
+                encode_initialize_forum(&forum_id_bytes, k_strikes, n_moderators, m_moderators);
             let effective_payer = resolve_payer(payer)?;
             let accounts = vec![
                 format!("{effective_forum_pda}:nosign"),
                 format!("{effective_payer}:sign"),
             ];
-            execute_tx(&effective_program, &accounts, data, Some(&effective_payer), json).await
+            execute_tx(
+                &effective_program,
+                &accounts,
+                data,
+                Some(&effective_payer),
+                json,
+            )
+            .await
         }
         Some(Commands::Raw {
             program,
@@ -375,9 +419,15 @@ async fn main() -> Result<()> {
             execute_tx(&program, &accounts, data, payer.as_deref(), json).await
         }
         None => {
-            let program = cli.program.context("--program is required when no subcommand is specified")?;
-            let accounts = cli.accounts.context("--accounts is required when no subcommand is specified")?;
-            let data_hex = cli.data_hex.context("--data-hex is required when no subcommand is specified")?;
+            let program = cli
+                .program
+                .context("--program is required when no subcommand is specified")?;
+            let accounts = cli
+                .accounts
+                .context("--accounts is required when no subcommand is specified")?;
+            let data_hex = cli
+                .data_hex
+                .context("--data-hex is required when no subcommand is specified")?;
             let clean_hex = data_hex.trim_start_matches("0x");
             let data = hex::decode(clean_hex).context("Failed to decode data_hex")?;
             execute_tx(&program, &accounts, data, cli.payer.as_deref(), cli.json).await
