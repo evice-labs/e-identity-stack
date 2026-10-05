@@ -414,6 +414,59 @@
           "type": "u32"
         }
       ]
+    },
+    {
+      "name": "register_username",
+      "accounts": [
+        {
+          "name": "state",
+          "writable": true,
+          "signer": false,
+          "init": false,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": "forum"
+              },
+              {
+                "kind": "arg",
+                "path": "forum_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "member",
+          "writable": false,
+          "signer": true,
+          "init": false
+        }
+      ],
+      "args": [
+        {
+          "name": "forum_id",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "commitment",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        },
+        {
+          "name": "username",
+          "type": "string"
+        }
+      ]
     }
   ]
 }

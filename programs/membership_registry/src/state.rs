@@ -16,8 +16,15 @@ pub struct ForumInstance {
     pub rooms: Vec<OnChainRoom>,
     pub room_memberships: Vec<OnChainMembership>,
     pub recorded_strikes: Vec<OnChainStrike>,
-    /// Monotonic index counter for ordering.
     pub current_index: u64,
+    pub usernames: Vec<OnChainUsername>,
+}
+
+/// On-chain username mapping (commitment <-> username).
+#[derive(BorshDeserialize, BorshSerialize, Clone, Debug, PartialEq)]
+pub struct OnChainUsername {
+    pub commitment: [u8; 32],
+    pub username: String,
 }
 
 /// On-chain room configuration (mirrors e_identity_sdk::types::RoomConfig).

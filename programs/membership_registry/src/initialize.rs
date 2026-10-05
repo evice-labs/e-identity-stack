@@ -29,6 +29,7 @@ pub fn process_initialize(
         room_memberships: Vec::new(),
         recorded_strikes: Vec::new(),
         current_index: 0,
+        usernames: Vec::new(),
     };
 
     Ok(new_forum)

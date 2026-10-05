@@ -331,4 +331,44 @@ mod forum_registry {
             vec![],
         ))
     }
+
+    #[instruction]
+    pub fn register_username(
+        #[account(mut, pda = [literal("forum"), arg("forum_id")])] state: AccountWithMetadata,
+        #[account(signer)] member: AccountWithMetadata,
+        forum_id: [u8; 32],
+        commitment: [u8; 32],
+        username: String,
+    ) -> SpelResult {
+        let mut forum: ForumInstance = borsh::from_slice(&state.account.data).map_err(|_| {
+            spel_framework::error::SpelError::Custom {
+                code: 34,
+                message: "Deserialization error".into(),
+            }
+        })?;
+
+        register::process_register_username(&mut forum, commitment, username).map_err(|e| {
+            spel_framework::error::SpelError::Custom {
+                code: 35,
+                message: e.into(),
+            }
+        })?;
+
+        let mut state = state;
+        state.account.data = borsh::to_vec(&forum)
+            .map_err(|_| spel_framework::error::SpelError::Custom {
+                code: 36,
+                message: "Serialization error".into(),
+            })?
+            .try_into()
+            .map_err(|_| spel_framework::error::SpelError::Custom {
+                code: 37,
+                message: "Data too large".into(),
+            })?;
+
+        Ok(SpelOutput::execute(
+            vec![state.account, member.account],
+            vec![],
+        ))
+    }
 }
