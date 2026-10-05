@@ -1,0 +1,21 @@
+[package]
+name = "e_cloak_dispatcher"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+lee_core = { workspace = true }
+lee = { workspace = true }
+common = { workspace = true }
+wallet = { workspace = true }
+sequencer_service_rpc = { workspace = true }
+program_loader_core = { workspace = true }
+
+clap = { workspace = true }
+tokio = { workspace = true }
+hex = { workspace = true }
+anyhow = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+borsh = { workspace = true }
+sha2 = { workspace = true }

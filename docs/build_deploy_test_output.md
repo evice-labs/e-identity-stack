@@ -6,38 +6,71 @@ Building guest package: program_methods
 Docker context: "/home/namauser/logos-ecosystem/project/e-identity-stack"
 Building ELF binaries in program_methods for riscv32im-risc0-zkvm-elf target...
 Docker version 29.7.2, build a7dcaa6fdb
-Cargo.lock not found in path /home/namauser/logos-ecosystem/project/e-identity-stack/program_methods/guest/Cargo.lock
 [+] Building 243.6s (10/10) FINISHED                                                            docker:default
  => [internal] load build definition from Dockerfile                                                      0.2s
- => => transferring dockerfile: 980B                                                                      0.0s
  => [internal] load metadata for docker.io/risczero/risc0-guest-builder:r0.1.91.1                         1.9s
  => [build 1/5] FROM docker.io/risczero/risc0-guest-builder:r0.1.91.1@sha256:fafb377a44e1cfca415577c48d2  0.0s
- => [internal] load build context                                                                         0.2s
- => => transferring context: 47.12kB                                                                      0.0s
- => CACHED [build 2/5] WORKDIR /src                                                                       0.0s
+ => [build 2/5] WORKDIR /src                                                                              0.0s
  => [build 3/5] COPY . .                                                                                  0.3s
  => [build 4/5] RUN cargo +risc0 fetch --locked --target riscv32im-risc0-zkvm-elf --manifest-path progr  56.8s
  => [build 5/5] RUN cargo +risc0 build --release --locked --target riscv32im-risc0-zkvm-elf --manifest  170.1s 
  => [export 1/1] COPY --from=build /src/target/riscv32im-risc0-zkvm-elf/release /                         5.3s 
  => exporting to client directory                                                                         0.9s 
  => => copying files 188.31MB                                                                             0.9s 
-                                                                                                               
- 2 warnings found (use docker --debug to expand):                                                              
- - FromAsCasing: 'as' and 'FROM' keywords' casing do not match (line 14)                                       
- - FromAsCasing: 'as' and 'FROM' keywords' casing do not match (line 1)
+
 ELFs ready at:
 ImageID: b8edb92e7e3eca8a9210609edac675a388a7f69256a8f0b28b9404f1a1cbe12a - /home/namauser/logos-ecosystem/project/e-identity-stack/target/riscv32im-risc0-zkvm-elf/docker/forum_membership_proof.bin
-ImageID: 45fcc43f74bca2614b417fe39559ac0c4cccdae0092187223d8cfc2e98ed7c16 - /home/namauser/logos-ecosystem/project/e-identity-stack/target/riscv32im-risc0-zkvm-elf/docker/membership_registry.bin
+ImageID: 6d4e64a01fae17237c9c1e7b61409773e5ba99ec9489c3586ea5fca29f1c7d5b - /home/namauser/logos-ecosystem/project/e-identity-stack/target/riscv32im-risc0-zkvm-elf/docker/membership_registry.bin
 ```
 
 ## Deploy Program
 
 ```bash
-$ wallet deploy-program target/riscv32im-risc0-zkvm-elf/docker/membership_registry.bin
-Transaction hash is e8af9dc3af21d369a26b9a494eef274d5b5a0720ca722c036d76965fe84a4889
-Transaction is included in block 41478
-Transaction data is ProgramDeployment(ProgramDeploymentTransaction { message: Message { bytecode: <554536 bytes> } })
+$ wallet deploy-program target/riscv32im-risc0-zkvm-elf/docker/membership_registry.bin --payer Public/9p7BZn9g6UrVMBiatyeNtq4yv9DitxYM1ZXsjYi6vf47
+
+[Step 1 - Uploading Segmen 5]
+Transaction hash is f8180ce9396e4afe69225fa4b5fe1395ab8ed3fb718c25eb5adc504dff88f1f0
+Transaction is included in block 6230
+Fee: Some(FeeDeclaration { payer: 9p7BZn9g6UrVMBiatyeNtq4yv9DitxYM1ZXsjYi6vf47, gas_limit: 200000, tip: 0, max_fee: 19200000 })
 Stored persistent accounts at /home/namauser/.lee/wallet/storage.json
+
+[Step 2 - Uploading Segmen 4]
+Transaction hash is a8bc7e85fc5abb959ed6ec6dec7b75641877124a88670b12895453af2d2f38cf
+Transaction is included in block 6232
+Fee: Some(FeeDeclaration { payer: 9p7BZn9g6UrVMBiatyeNtq4yv9DitxYM1ZXsjYi6vf47, gas_limit: 200000, tip: 0, max_fee: 19200000 })
+Stored persistent accounts at /home/namauser/.lee/wallet/storage.json
+
+[Step 3 - Uploading Segmen 3]
+Transaction hash is cb7020bc706ae2e0589c91d41e1f9d25fd0bbc3ea305068a35778ff5a107e8f0
+Transaction is included in block 6233
+Fee: Some(FeeDeclaration { payer: 9p7BZn9g6UrVMBiatyeNtq4yv9DitxYM1ZXsjYi6vf47, gas_limit: 200000, tip: 0, max_fee: 19200000 })
+Stored persistent accounts at /home/namauser/.lee/wallet/storage.json
+
+[Step 4 - Uploading Segmen 2]
+Transaction hash is e40fabe88ba31945fae4109188906ea95d0ddad990fdc12233cea51a0057f083
+Transaction is included in block 6234
+Fee: Some(FeeDeclaration { payer: 9p7BZn9g6UrVMBiatyeNtq4yv9DitxYM1ZXsjYi6vf47, gas_limit: 200000, tip: 0, max_fee: 19200000 })
+Stored persistent accounts at /home/namauser/.lee/wallet/storage.json
+
+[Step 5 - Uploading Segmen 1]
+Transaction hash is 7a50530bc1c4f118276675b179cb8841f0bbe303283824b1f811d8b1abfd1c9b
+Transaction is included in block 6235
+Fee: Some(FeeDeclaration { payer: 9p7BZn9g6UrVMBiatyeNtq4yv9DitxYM1ZXsjYi6vf47, gas_limit: 200000, tip: 0, max_fee: 19200000 })
+Stored persistent accounts at /home/namauser/.lee/wallet/storage.json
+
+[Step 6 - Uploading Segmen 0]
+Transaction hash is 8f5db75e90ecb513377e7e45db88ad04e74ef2d70478f35ec5e51dc111ff037d
+Transaction is included in block 6236
+Fee: Some(FeeDeclaration { payer: 9p7BZn9g6UrVMBiatyeNtq4yv9DitxYM1ZXsjYi6vf47, gas_limit: 200000, tip: 0, max_fee: 19200000 })
+Stored persistent accounts at /home/namauser/.lee/wallet/storage.json
+
+[Step 7 - Initiating Program Header]
+Transaction hash is fb6e260887640c871f6e5bbc6e74e4ab41c8fe9623616d63bce8b2b58ed80eb8
+Transaction is included in block 6238
+Fee: Some(FeeDeclaration { payer: 9p7BZn9g6UrVMBiatyeNtq4yv9DitxYM1ZXsjYi6vf47, gas_limit: 200000, tip: 0, max_fee: 19200000 })
+Stored persistent accounts at /home/namauser/.lee/wallet/storage.json
+
+Program deployed. Header account id: 6qxUjaw8NoLvC7Nf3E2nA2jGxXQKmwKCNGxQaYe1N3zW
 Stored statistics at /home/namauser/.lee/wallet/statistics.json
 ```
 
@@ -62,7 +95,7 @@ $ spel --idl idl.json -p $PROG -- \
 📋 Instruction: initialize_forum
 
 Accounts:
-  📦 state → 6GmmipskJUQzCstnyPDWrM9uGp98cXAENwtR6yoRUQQa (PDA)
+  📦 state → 99jBsXRbK91xCJR5WnxFVR2cuGvga8M4dDfaT3J2oC1Q (PDA)
     seeds: [program_id, "forum", Arg(forum_id)]
   📦 admin → 0x82eec89bab481a5d70bb753ab162ae0f53dfcb761f35fd20c210911e926b6f04
 
@@ -73,7 +106,7 @@ Arguments (parsed):
   m_moderators = 3
 
 🔧 Transaction:
-  program-id: 45fcc43f74bca2614b417fe39559ac0c4cccdae0092187223d8cfc2e98ed7c16
+  program-id: 6d4e64a01fae17237c9c1e7b61409773e5ba99ec9489c3586ea5fca29f1c7d5b
   program:    target/riscv32im-risc0-zkvm-elf/docker/membership_registry.bin
   instruction index: 0
   instruction: InitializeForum {
@@ -104,7 +137,7 @@ $ spel --idl idl.json -p $PROG -- \
 📋 Instruction: register_member
 
 Accounts:
-  📦 state → 6GmmipskJUQzCstnyPDWrM9uGp98cXAENwtR6yoRUQQa (PDA)
+  📦 state → 99jBsXRbK91xCJR5WnxFVR2cuGvga8M4dDfaT3J2oC1Q (PDA)
     seeds: [program_id, "forum", Arg(forum_id)]
   📦 member → 0x82eec89bab481a5d70bb753ab162ae0f53dfcb761f35fd20c210911e926b6f04
 
@@ -114,7 +147,7 @@ Arguments (parsed):
   stake_amount = 1000
 
 🔧 Transaction:
-  program-id: 45fcc43f74bca2614b417fe39559ac0c4cccdae0092187223d8cfc2e98ed7c16
+  program-id: 6d4e64a01fae17237c9c1e7b61409773e5ba99ec9489c3586ea5fca29f1c7d5b
   program:    target/riscv32im-risc0-zkvm-elf/docker/membership_registry.bin
   instruction index: 1
   instruction: RegisterMember {
@@ -133,6 +166,42 @@ Arguments (parsed):
 ✅ Transaction confirmed — included in a block.
 ```
 
+## Register Username
+
+```bash
+$ spel --idl idl.json -p $PROG --   register-username   --member $MY_ACCOUNT   --forum-id $FORUM_ID   --commitment $COMMITMENT   --username "Syafiqeil"
+📋 Instruction: register_username
+
+Accounts:
+  📦 state → 99jBsXRbK91xCJR5WnxFVR2cuGvga8M4dDfaT3J2oC1Q (PDA)
+    seeds: [program_id, "forum", Arg(forum_id)]
+  📦 member → 0x82eec89bab481a5d70bb753ab162ae0f53dfcb761f35fd20c210911e926b6f04
+
+Arguments (parsed):
+  forum_id = 0x0302030405060708091011121314151617181920212223242526272829303132
+  commitment = 0x0a0b0c0d0e0f1011121314151617181920212223242526272829303132333435
+  username = "Syafiqeil"
+
+🔧 Transaction:
+  program-id: 6d4e64a01fae17237c9c1e7b61409773e5ba99ec9489c3586ea5fca29f1c7d5b
+  program:    target/riscv32im-risc0-zkvm-elf/docker/membership_registry.bin
+  instruction index: 7
+  instruction: RegisterUsername {
+    forum_id: 0x0302030405060708091011121314151617181920212223242526272829303132,
+    commitment: 0x0a0b0c0d0e0f1011121314151617181920212223242526272829303132333435,
+    username: "Syafiqeil",
+  }
+
+  Serialized instruction data (70 u32 words):
+    [00000007, 00000003, 00000002, 00000003, 00000004, 00000005, 00000006, 00000007, 00000008, 00000009, 00000010, 00000011, 00000012, 00000013, 00000014, 00000015, 00000016, 00000017, 00000018, 00000019, 00000020, 00000021, 00000022, 00000023, 00000024, 00000025, 00000026, 00000027, 00000028, 00000029, 00000030, 00000031, 00000032, 0000000a, 0000000b, 0000000c, 0000000d, 0000000e, 0000000f, 00000010, 00000011, 00000012, 00000013, 00000014, 00000015, 00000016, 00000017, 00000018, 00000019, 00000020, 00000021, 00000022, 00000023, 00000024, 00000025, 00000026, 00000027, 00000028, 00000029, 00000030, 00000031, 00000032, 00000033, 00000034, 00000035, 00000009, 00000053, 00000079, 00000061, 00000066, 00000069, 00000071, 00000065, 00000069, 0000006c]
+
+📤 Submitting transaction...
+📤 Transaction submitted!
+   tx_hash: a1c8531e285a7304bf9de489b02a28b082ffc40e1f37e4c19ad17d23f99e4b7a
+   Waiting for confirmation...
+✅ Transaction confirmed — included in a block.
+```
+
 ## Register Room  
 ```bash
 $ spel --idl idl.json -p $PROG -- \
@@ -146,7 +215,7 @@ $ spel --idl idl.json -p $PROG -- \
 📋 Instruction: register_room
 
 Accounts:
-  📦 state → 6GmmipskJUQzCstnyPDWrM9uGp98cXAENwtR6yoRUQQa (PDA)
+  📦 state → 99jBsXRbK91xCJR5WnxFVR2cuGvga8M4dDfaT3J2oC1Q (PDA)
     seeds: [program_id, "forum", Arg(forum_id)]
   📦 admin → 0x82eec89bab481a5d70bb753ab162ae0f53dfcb761f35fd20c210911e926b6f04
 
@@ -159,7 +228,7 @@ Arguments (parsed):
   min_members_for_maturity = 1
 
 🔧 Transaction:
-  program-id: 45fcc43f74bca2614b417fe39559ac0c4cccdae0092187223d8cfc2e98ed7c16
+  program-id: 6d4e64a01fae17237c9c1e7b61409773e5ba99ec9489c3586ea5fca29f1c7d5b
   program:    target/riscv32im-risc0-zkvm-elf/docker/membership_registry.bin
   instruction index: 3
   instruction: RegisterRoom {
@@ -192,7 +261,7 @@ $ spel --idl idl.json -p $PROG -- \
 📋 Instruction: join_room
 
 Accounts:
-  📦 state → 6GmmipskJUQzCstnyPDWrM9uGp98cXAENwtR6yoRUQQa (PDA)
+  📦 state → 99jBsXRbK91xCJR5WnxFVR2cuGvga8M4dDfaT3J2oC1Q (PDA)
     seeds: [program_id, "forum", Arg(forum_id)]
   📦 member → 0x82eec89bab481a5d70bb753ab162ae0f53dfcb761f35fd20c210911e926b6f04
 
@@ -202,7 +271,7 @@ Arguments (parsed):
   member_commitment = 0x0a0b0c0d0e0f1011121314151617181920212223242526272829303132333435
 
 🔧 Transaction:
-  program-id: 45fcc43f74bca2614b417fe39559ac0c4cccdae0092187223d8cfc2e98ed7c16
+  program-id: 6d4e64a01fae17237c9c1e7b61409773e5ba99ec9489c3586ea5fca29f1c7d5b
   program:    target/riscv32im-risc0-zkvm-elf/docker/membership_registry.bin
   instruction index: 2
   instruction: JoinRoom {
@@ -236,7 +305,7 @@ $ spel --idl idl.json -p $PROG -- \
 📋 Instruction: record_strike
 
 Accounts:
-  📦 state → 6GmmipskJUQzCstnyPDWrM9uGp98cXAENwtR6yoRUQQa (PDA)
+  📦 state → 99jBsXRbK91xCJR5WnxFVR2cuGvga8M4dDfaT3J2oC1Q (PDA)
     seeds: [program_id, "forum", Arg(forum_id)]
 
 Arguments (parsed):
@@ -247,7 +316,7 @@ Arguments (parsed):
   n_valid_sigs = 1
 
 🔧 Transaction:
-  program-id: 45fcc43f74bca2614b417fe39559ac0c4cccdae0092187223d8cfc2e98ed7c16
+  program-id: 6d4e64a01fae17237c9c1e7b61409773e5ba99ec9489c3586ea5fca29f1c7d5b
   program:    target/riscv32im-risc0-zkvm-elf/docker/membership_registry.bin
   instruction index: 4
   instruction: RecordStrike {
@@ -281,7 +350,7 @@ $ spel --idl idl.json -p $PROG -- \
 📋 Instruction: record_strike
 
 Accounts:
-  📦 state → 6GmmipskJUQzCstnyPDWrM9uGp98cXAENwtR6yoRUQQa (PDA)
+  📦 state → 99jBsXRbK91xCJR5WnxFVR2cuGvga8M4dDfaT3J2oC1Q (PDA)
     seeds: [program_id, "forum", Arg(forum_id)]
 
 Arguments (parsed):
@@ -292,7 +361,7 @@ Arguments (parsed):
   n_valid_sigs = 1
 
 🔧 Transaction:
-  program-id: 45fcc43f74bca2614b417fe39559ac0c4cccdae0092187223d8cfc2e98ed7c16
+  program-id: 6d4e64a01fae17237c9c1e7b61409773e5ba99ec9489c3586ea5fca29f1c7d5b
   program:    target/riscv32im-risc0-zkvm-elf/docker/membership_registry.bin
   instruction index: 4
   instruction: RecordStrike {
@@ -325,7 +394,7 @@ $ spel --idl idl.json -p $PROG -- \
 📋 Instruction: record_strike
 
 Accounts:
-  📦 state → 6GmmipskJUQzCstnyPDWrM9uGp98cXAENwtR6yoRUQQa (PDA)
+  📦 state → 99jBsXRbK91xCJR5WnxFVR2cuGvga8M4dDfaT3J2oC1Q (PDA)
     seeds: [program_id, "forum", Arg(forum_id)]
 
 Arguments (parsed):
@@ -336,7 +405,7 @@ Arguments (parsed):
   n_valid_sigs = 1
 
 🔧 Transaction:
-  program-id: 45fcc43f74bca2614b417fe39559ac0c4cccdae0092187223d8cfc2e98ed7c16
+  program-id: 6d4e64a01fae17237c9c1e7b61409773e5ba99ec9489c3586ea5fca29f1c7d5b
   program:    target/riscv32im-risc0-zkvm-elf/docker/membership_registry.bin
   instruction index: 4
   instruction: RecordStrike {
@@ -368,7 +437,7 @@ $ spel --idl idl.json -p $PROG -- \
 📋 Instruction: slash_member
 
 Accounts:
-  📦 state → 6GmmipskJUQzCstnyPDWrM9uGp98cXAENwtR6yoRUQQa (PDA)
+  📦 state → 99jBsXRbK91xCJR5WnxFVR2cuGvga8M4dDfaT3J2oC1Q (PDA)
     seeds: [program_id, "forum", Arg(forum_id)]
   📦 authority → 0x82eec89bab481a5d70bb753ab162ae0f53dfcb761f35fd20c210911e926b6f04
 
@@ -380,7 +449,7 @@ Arguments (parsed):
   min_room_members = 0
 
 🔧 Transaction:
-  program-id: 45fcc43f74bca2614b417fe39559ac0c4cccdae0092187223d8cfc2e98ed7c16
+  program-id: 6d4e64a01fae17237c9c1e7b61409773e5ba99ec9489c3586ea5fca29f1c7d5b
   program:    target/riscv32im-risc0-zkvm-elf/docker/membership_registry.bin
   instruction index: 6
   instruction: SlashMember {

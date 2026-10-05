@@ -1,0 +1,6 @@
+{
+  "network": "testnet",
+  "sequencer_rpc": "https://testnet.lez.logos.co/",
+  "program_header": "Public/6qxUjaw8NoLvC7Nf3E2nA2jGxXQKmwKCNGxQaYe1N3zW",
+  "default_forum_id": "0302030405060708091011121314151617181920212223242526272829303132"
+}
